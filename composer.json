@@ -8,6 +8,7 @@
         "php": "^8.2",
         "laravel/framework": "^11.9",
         "laravel/tinker": "^2.9",
+        "uspdev/laravel-usp-theme": "^2.8",
         "uspdev/replicado": "^1.24",
         "uspdev/senhaunica-socialite": "^4.3"
     },
@@ -35,6 +36,7 @@
     "scripts": {
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
+            "@php artisan vendor:publish --provider=\"Uspdev\\UspTheme\\ServiceProvider\" --tag=assets --force",
             "@php artisan package:discover --ansi"
         ],
         "post-update-cmd": [
