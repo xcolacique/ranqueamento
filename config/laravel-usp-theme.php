@@ -7,8 +7,8 @@ $admin = [
         'can' => 'admin',
     ],
     [
-        'text' => 'Ingressantes',
-        'url' => config('app.url') . '/admin/ingressantes',
+        'text' => 'Ciclo Básico',
+        'url' => config('app.url') . '/admin/ciclo_basico',
         'can' => 'admin',
     ],
 ];

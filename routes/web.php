@@ -8,4 +8,4 @@ use App\Http\Controllers\RanqueamentoController;
 
 Route::get('/',[IndexController::class, 'index']);
 Route::resource('/ranqueamentos',RanqueamentoController::class);
-Route::get('/admin/ingressantes',[AdminController::class, 'ingressantes']);
+Route::get('/admin/ciclo_basico',[AdminController::class, 'ciclo_basico']);
