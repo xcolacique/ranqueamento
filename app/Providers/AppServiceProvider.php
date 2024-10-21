@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 
 use App\Models\User;
+use App\Models\Ranqueamento;
 use App\Service\Utils;
 
 class AppServiceProvider extends ServiceProvider
@@ -24,7 +25,13 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::define('ciclo_basico', function (User $user) {
-            return Utils::ciclo_basico_check($user->codpes);
+            $ranqueamento = Ranqueamento::where('status',1)->first();
+
+            // TODO: Falta considerar as exceções
+            if($ranqueamento) {
+                return Utils::ciclo_basico_check($user->codpes, $ranqueamento->ano);
+            }
+            return false;
         });
     }
 }

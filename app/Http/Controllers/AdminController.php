@@ -8,7 +8,7 @@ use App\Service\Utils;
 
 class AdminController extends Controller
 {
-    public function ciclo_basico(){
+    public function ciclo_basico(Request $request){
 
         $ranqueamento = Ranqueamento::where('status',1)->first();
         if(!$ranqueamento){
@@ -16,8 +16,9 @@ class AdminController extends Controller
             return redirect('/');
         }
 
-        $ciclo_basico_elegiveis = Utils::ciclo_basico_elegiveis(2024);
-        $ciclo_basico_nao_elegiveis = Utils::ciclo_basico_nao_elegiveis(2024);
+        $ciclo_basico_elegiveis = Utils::ciclo_basico_elegiveis($ranqueamento->ano);
+        $ciclo_basico_nao_elegiveis = Utils::ciclo_basico_nao_elegiveis($ranqueamento->ano);
+
         return view('admin.ciclo_basico', [
             'ciclo_basico_elegiveis' => $ciclo_basico_elegiveis,
             'ciclo_basico_nao_elegiveis' => $ciclo_basico_nao_elegiveis,

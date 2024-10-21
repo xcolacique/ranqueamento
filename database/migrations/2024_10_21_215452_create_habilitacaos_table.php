@@ -11,13 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ranqueamentos', function (Blueprint $table) {
+        Schema::create('habilitacaos', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->integer('ano');
-            $table->string('tipo');
-            $table->boolean('status');
-            $table->text('permitidos')->nullable();
+
+            $table->foreignId('ranqueamento_id')->constrained();
+            $table->integer('codhab');
+            $table->string('nomhab');
+            $table->integer('perhab');
+            $table->integer('vagas');
         });
     }
 
@@ -26,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('ranqueamentos');
+        Schema::dropIfExists('habilitacaos');
     }
 };

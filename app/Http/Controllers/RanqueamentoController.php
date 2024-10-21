@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
 use App\Models\Ranqueamento;
+use App\Rules\CodpesRule;
+use App\Service\Utils;
 
 class RanqueamentoController extends Controller
 {
@@ -21,7 +23,9 @@ class RanqueamentoController extends Controller
     public function create()
     {
         Gate::authorize('admin');
-        return view('ranqueamentos.create'); 
+        return view('ranqueamentos.create',[
+            'habs' => Utils::lista_habs(),
+        ]); 
     }
 
     public function store(Request $request)
@@ -31,7 +35,8 @@ class RanqueamentoController extends Controller
         $request->validate([
             'ano'    => 'required|integer', # entre 2024 e 2100?
             'tipo'   => 'required', # TODO: validar somente ingressantes e reranqueamento
-            'status' => 'nullable' # só pode se nulo ou 1
+            'status' => 'nullable', # só pode se nulo ou 1
+            'permitidos' => ['nullable', new CodpesRule]
         ]);
 
         // Se o status não foi ativado, será null
@@ -49,6 +54,7 @@ class RanqueamentoController extends Controller
         $ranqueamento->ano = $request->ano;
         $ranqueamento->tipo = $request->tipo;
         $ranqueamento->status = $request->status;
+        $ranqueamento->permitidos = Utils::limpa_string_de_codpes($request->permitidos);
         $ranqueamento->save();
         return redirect("/ranqueamentos"); 
     }
@@ -75,7 +81,8 @@ class RanqueamentoController extends Controller
         $request->validate([
             'ano'    => 'required|integer', # entre 2024 e 2100?
             'tipo'   => 'required', # TODO: validar somente ingressantes e reranqueamento
-            'status' => 'nullable' # só pode se nulo ou 1
+            'status' => 'nullable', # só pode se nulo ou 1
+            'permitidos' => ['nullable', new CodpesRule]
         ]);
 
         // Se o status não foi ativado, será null
@@ -92,6 +99,7 @@ class RanqueamentoController extends Controller
         $ranqueamento->ano = $request->ano;
         $ranqueamento->tipo = $request->tipo;
         $ranqueamento->status = $request->status;
+        $ranqueamento->permitidos = Utils::limpa_string_de_codpes($request->permitidos);
         $ranqueamento->save();
         return redirect("/ranqueamentos"); 
     }
