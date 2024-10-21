@@ -8,8 +8,8 @@
       </div>
       <div class="card-body">
         <h5 class="card-title">Meu ranqueamento</h5>
-        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-        <a href="#" class="btn btn-primary">Go somewhere</a>
+        <p class="card-text">Em construção.</p>
+        <a href="#" class="btn btn-primary">Inicar ranqueamento</a>
       </div>
     </div>
   @else

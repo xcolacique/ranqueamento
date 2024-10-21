@@ -16,9 +16,11 @@ class AdminController extends Controller
             return redirect('/');
         }
 
-        $ciclo_basico = Utils::ciclo_basico();
+        $ciclo_basico_elegiveis = Utils::ciclo_basico_elegiveis(2024);
+        $ciclo_basico_nao_elegiveis = Utils::ciclo_basico_nao_elegiveis(2024);
         return view('admin.ciclo_basico', [
-            'ciclo_basico' => $ciclo_basico,
+            'ciclo_basico_elegiveis' => $ciclo_basico_elegiveis,
+            'ciclo_basico_nao_elegiveis' => $ciclo_basico_nao_elegiveis,
         ]);
     }
 }
