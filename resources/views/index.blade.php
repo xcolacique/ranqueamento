@@ -7,9 +7,15 @@
         Meu ranqueamento
       </div>
       <div class="card-body">
-        <h5 class="card-title">Meu ranqueamento</h5>
-        <p class="card-text">Em construção.</p>
-        <a href="#" class="btn btn-primary">Inicar ranqueamento</a>
+        <h5 class="card-title"></h5>
+        <p class="card-text">
+          <b>Número USP:</b> {{ auth()->user()->codpes }}<br>
+          <b>Nome:</b> {{ auth()->user()->name }}<br>
+          <b>Email:</b> {{ auth()->user()->email }}<br>
+          <b>Período:</b> {{ \App\Service\Utils::periodo(auth()->user()->codpes) }}<br>
+
+        </p>
+        <a href="#" class="btn btn-primary">Iniciar ou continuar Ranqueamento</a>
       </div>
     </div>
   @else

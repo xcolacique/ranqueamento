@@ -27,10 +27,12 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('ciclo_basico', function (User $user) {
             $ranqueamento = Ranqueamento::where('status',1)->first();
 
-            // TODO: Falta considerar as exceções
             if($ranqueamento) {
-                return Utils::ciclo_basico_check($user->codpes, $ranqueamento->ano);
+                return 
+                    Utils::ciclo_basico_check($user->codpes, $ranqueamento->ano)
+                    | in_array($user->codpes,explode(',',$ranqueamento->permitidos));
             }
+
             return false;
         });
     }

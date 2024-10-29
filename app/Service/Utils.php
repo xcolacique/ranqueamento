@@ -85,6 +85,22 @@ class Utils
         return DB::fetchAll($query);
     }
 
+    public static function periodo(int $codpes){
+
+        $query = "SELECT V.codhab
+        FROM VINCULOPESSOAUSP V
+        WHERE V.tipvin = 'ALUNOGR'
+            AND (V.codclg = 8)
+            AND (V.codhab=102 OR V.codhab=104)
+            AND (V.codcurgrd = 8051)
+            AND V.codpes = $codpes
+        ";
+        $record = DB::fetch($query);
+        if(!$record) return '';
+        if($record['codhab'] == 102) return 'matutino';
+        if($record['codhab'] == 104) return 'noturno';
+    }
+
     public static function get_hab($codhab){
         $query = "SELECT H.codhab, H.nomhab, H.perhab
             FROM CURSOGR C, HABILITACAOGR H
