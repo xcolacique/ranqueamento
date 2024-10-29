@@ -11,15 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('habilitacaos', function (Blueprint $table) {
+        Schema::create('habs', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-
             $table->foreignId('ranqueamento_id')->constrained();
             $table->integer('codhab');
             $table->string('nomhab');
-            $table->integer('perhab');
-            $table->integer('vagas');
+            $table->string('perhab');
+            $table->boolean('permite_ambos_periodos')->default(0);
+            $table->integer('vagas')->default(0);
         });
     }
 
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('habilitacaos');
+        Schema::dropIfExists('habs');
     }
 };

@@ -50,6 +50,29 @@
                     </div>
 
                     <div class="form-group">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                <th scope="col" class="w-25">Vagas</th>
+                                <th scope="col" class="w-25">Permitir ambos períodos?</th>
+                                <th scope="col" class="w-50">Habilitação</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($habs as $hab)
+                                <tr>
+                                    <td><input type="number" name="hab-{{$hab['codhab']}}" value="{{ old('hab-'.$hab['codhab'],$hab->vagas)}}" required></td>
+                                    <td><input type="checkbox" name="checkbox-{{$hab['codhab']}}" value=1 
+                                        {{ $hab->permite_ambos_periodos==1 ? 'checked': '' }}>
+                                    </td>
+                                    <td>{{ $hab->codhab }} {{ $hab->nomhab }} {{ $hab->perhab }}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="form-group">
                         <input type="submit" class="btn btn-primary" value="Cadastrar">
                     </div>
                 </form>

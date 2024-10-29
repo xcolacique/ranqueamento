@@ -85,6 +85,21 @@ class Utils
         return DB::fetchAll($query);
     }
 
+    public static function get_hab($codhab){
+        $query = "SELECT H.codhab, H.nomhab, H.perhab
+            FROM CURSOGR C, HABILITACAOGR H
+            WHERE C.codclg = 8
+            AND C.codcur = 8051
+            AND H.nomhab NOT LIKE '%Portugu%'
+            AND H.tiphab = 'I'
+            AND C.codcur = H.codcur
+            AND H.codhab = $codhab
+            AND ( (H.dtaatvhab IS NOT NULL) AND (H.dtadtvhab IS NULL) )
+            ORDER BY H.nomhab ASC
+        ";
+        return DB::fetch($query);
+    }
+
     public static function limpa_string_de_codpes($string){
         $array = explode(',',$string);
         $array = array_map('trim', $array);
