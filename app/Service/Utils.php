@@ -3,6 +3,8 @@
 namespace App\Service;
 
 use Uspdev\Replicado\DB;
+use App\Models\Declinio;
+use App\Models\Ranqueamento;
 
 class Utils
 {
@@ -85,7 +87,8 @@ class Utils
         return DB::fetchAll($query);
     }
 
-    public static function periodo(int $codpes){
+    public static function periodo(){
+        $codpes = auth()->user()->codpes;
 
         $query = "SELECT V.codhab
         FROM VINCULOPESSOAUSP V
@@ -122,5 +125,14 @@ class Utils
         $array = array_unique($array);
         sort($array);
         return implode(',',$array);
+    }
+
+    public static function declinou(){
+        $ranqueamento = Ranqueamento::where('status',1)->first();
+        $declinio = Declinio::where('ranqueamento_id',$ranqueamento->id)
+                            ->where('user_id',auth()->user()->id)->first();
+
+        if($declinio) return true;
+        return false;
     }
 }

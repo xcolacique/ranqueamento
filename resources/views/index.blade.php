@@ -12,9 +12,15 @@
           <b>Número USP:</b> {{ auth()->user()->codpes }}<br>
           <b>Nome:</b> {{ auth()->user()->name }}<br>
           <b>Email:</b> {{ auth()->user()->email }}<br>
-          <b>Período:</b> {{ \App\Service\Utils::periodo(auth()->user()->codpes) }}<br>
-
+          <b>Período:</b> {{ \App\Service\Utils::periodo() }}<br>
+          <b>Declinou do português?</b>
+          @if(\App\Service\Utils::declinou())
+            sim <button type="submit" class="btn btn-warning"> Cancelar declinação </button>
+          @else 
+            não <button type="submit" class="btn btn-warning"> Quero declinar </button>
+          @endif
         </p>
+        <br>
         <a href="#" class="btn btn-primary">Iniciar ou continuar Ranqueamento</a>
       </div>
     </div>
