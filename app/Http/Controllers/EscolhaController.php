@@ -7,7 +7,8 @@ use Illuminate\Support\Facades\Gate;
 use App\Models\Declinio;
 use App\Models\Ranqueamento;
 use App\Models\Hab;
-
+use App\Models\Escolha;
+use App\Rules\EscolhaRule;
 use App\Service\Utils;
 
 class EscolhaController extends Controller
@@ -16,6 +17,9 @@ class EscolhaController extends Controller
     public function form(){
         Gate::authorize('ciclo_basico');
         $ranqueamento = Ranqueamento::where('status',1)->first();
+        $escolhas = Escolha::where('ranqueamento_id',$ranqueamento->id)
+                            ->where('user_id', auth()->user()->id)
+                            ->get();
 
         $habs = Hab::where('ranqueamento_id',$ranqueamento->id)
                     ->where(function ($query) {
@@ -25,7 +29,8 @@ class EscolhaController extends Controller
                     })->get();
 
         return view('escolhas.form',[
-            'habs' => $habs
+            'habs' => $habs,
+            'escolhas' => $escolhas
         ]); 
     }
 
@@ -33,7 +38,25 @@ class EscolhaController extends Controller
         Gate::authorize('ciclo_basico');
         $ranqueamento = Ranqueamento::where('status',1)->first();
 
-        dd(array_filter($request->habs));
+        $request->validate([
+            'habs' => [ 'required', new EscolhaRule], 
+        ]);
+
+        foreach(array_filter($request->habs) as $prioridade=>$hab_id) {
+            $escolha = Escolha::where('ranqueamento_id',$ranqueamento->id)
+                                ->where('user_id', auth()->user()->id)
+                                ->where('prioridade', $prioridade)
+                                ->first();
+            if(!$escolha) {
+                $escolha = new Escolha;
+                $escolha->ranqueamento_id = $ranqueamento->id;
+                $escolha->user_id = auth()->user()->id;
+                $escolha->prioridade = $prioridade;
+            }
+            $escolha->hab_id = $hab_id;
+            $escolha->save();
+        }
+        return redirect("/");
     }
 
     public function declinar(Request $request){

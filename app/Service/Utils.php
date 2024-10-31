@@ -6,6 +6,7 @@ use Uspdev\Replicado\DB;
 use App\Models\Declinio;
 use App\Models\Ranqueamento;
 use App\Models\Escolha;
+use App\Models\Hab;
 
 class Utils
 {
@@ -147,6 +148,7 @@ class Utils
                             ->first();
 
         if(!$hab_id) return 'Não definido';
+        return Hab::find($hab_id->hab_id)->nomhab;
     }
 
     
