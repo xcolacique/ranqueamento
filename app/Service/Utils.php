@@ -148,8 +148,7 @@ class Utils
                             ->first();
 
         if(!$hab_id) return 'Não definido';
-        return Hab::find($hab_id->hab_id)->nomhab;
+        $hab = Hab::find($hab_id->hab_id);
+        return $hab->nomhab . ' - ' . $hab->perhab;
     }
-
-    
 }

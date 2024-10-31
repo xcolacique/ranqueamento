@@ -4,9 +4,6 @@
 
 @include('escolhas.partials.info')
 <br>
-
-<br>
-
 <div class="card">
     <div class="card-header">Opções para ranqueamento</div>
         <div class="card-body">
@@ -32,7 +29,7 @@
                         <select class="form-control" id="select{{$prioridade}}" name="habs[{{$prioridade}}]">
                             <option value="" selected=""> - Selecione  -</option>
                             @foreach($habs as $hab)
-                                <option value="{{ $hab->id }}" @if($hab_id_salva==$hab->id or $hab_id_old==$hab->id) selected @endif>{{$hab->nomhab}}</option>
+                                <option value="{{ $hab->id }}" @if($hab_id_salva==$hab->id or $hab_id_old==$hab->id) selected @endif>{{$hab->nomhab}} - {{$hab->perhab}}</option>
                             @endforeach
                         </select>
                     </div>

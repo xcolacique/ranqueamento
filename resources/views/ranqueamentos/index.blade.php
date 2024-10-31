@@ -13,6 +13,7 @@
                 <th>Ano</th>
                 <th>Tipo</th>
                 <th>Status</th>
+                <th>Inscrições</th>
                 <th colspan="2">Ações</th>
             </tr>
         </thead>
@@ -25,6 +26,7 @@
                     @else Desativado
                     @endif
                 </td>
+                <td><a href="/escolhas/{{ $ranqueamento->id }}" class="btn btn-info">Inscrições</a></td>
                 <td>
                     <a href="/ranqueamentos/{{ $ranqueamento->id }}/edit" class="btn btn-warning"><i class="fas fa-pencil-alt"></i></a>
                 </td>
