@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use App\Models\Ranqueamento;
 use App\Models\Hab;
@@ -34,9 +35,11 @@ class RanqueamentoController extends Controller
         Gate::authorize('admin');
 
         $request->validate([
-            'ano'        => 'required|integer', # entre 2024 e 2100?
+            'ano'        => [ 'required', 'between:2024,2100', 'integer', 
+                               Rule::unique('ranqueamentos', 'ano')->where('tipo', $request->tipo)
+                            ], 
             'tipo'       => 'required', # TODO: validar somente ingressantes e reranqueamento
-            'status'     => 'nullable', # só pode se nulo ou 1
+            'status'     => 'nullable', # só pode se nulo ou 1,
             'permitidos' => ['nullable', new CodpesRule]
         ]);
 
@@ -109,7 +112,10 @@ class RanqueamentoController extends Controller
         Gate::authorize('admin');
 
         $request->validate([
-            'ano'    => 'required|integer', # entre 2024 e 2100?
+            'ano'        => [ 'required', 'between:2024,2100', 'integer', 
+                               Rule::unique('ranqueamentos', 'ano')->where('tipo', $request->tipo)
+                               ->ignore($ranqueamento->id)
+                            ], 
             'tipo'   => 'required', # TODO: validar somente ingressantes e reranqueamento
             'status' => 'nullable', # só pode se nulo ou 1
             'permitidos' => ['nullable', new CodpesRule]
