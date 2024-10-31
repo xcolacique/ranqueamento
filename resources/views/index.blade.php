@@ -9,30 +9,14 @@
       <div class="card-body">
         <h5 class="card-title"></h5>
         <p class="card-text">
-          <b>Número USP:</b> {{ auth()->user()->codpes }}<br>
-          <b>Nome:</b> {{ auth()->user()->name }}<br>
-          <b>Email:</b> {{ auth()->user()->email }}<br>
-          <b>Período:</b> {{ \App\Service\Utils::periodo() }}<br>
-          @if(\App\Service\Utils::declinou())
-            <form class="form-inline" method="POST" action="{{ route('declinar') }}">
-              @csrf
-              <b>Declinou do português?</b>&nbsp;sim&nbsp;
-              <button type="submit"  role="form"class="btn btn-warning"  name="declinar" value=0 
-                onclick="return confirm('Tem certeza que deseja cancelar a declinação do português?');"> Cancelar declinação 
-              </button>
-            </form>
-          @else 
-            <form class="form-inline" method="POST" action="{{ route('declinar') }}">
-              @csrf
-              <b>Declinou do português?</b>&nbsp;não&nbsp; 
-              <button type="submit" class="btn btn-warning" name="declinar" value=1 
-                onclick="return confirm('Tem certeza que deseja declinar do português?');"> Quero declinar 
-              </button>
-            </form>
-          @endif
+          @include('escolhas.partials.info')
+          @include('escolhas.partials.declinio')
+          <br>
+          <a href="{{route('escolhas_form')}}" class="btn btn-primary">Editar opções de habilitações para ranqueamento</a>
+          <br><br>
+          @include('escolhas.partials.show')
         </p>
         <br>
-        <a href="#" class="btn btn-primary">Iniciar ou continuar Ranqueamento</a>
       </div>
     </div>
   @else

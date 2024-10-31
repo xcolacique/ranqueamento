@@ -122,19 +122,22 @@ class RanqueamentoController extends Controller
         ]);
 
         // Se o status não foi ativado, será null
-        if($request->status == null) $request->status = 0;
-
+        if($request->status == null) {
+            $ranqueamento->status = 0;
+        }
         // se foi ativado, todos demais ranqueamentos serão desativados
         if($request->status == 1) {
             foreach(Ranqueamento::all() as $r){
-                $r->status = 0;
-                $r->save();
+                if($r->id != $ranqueamento->id){
+                    $r->status = 0;
+                    $r->save();
+                }
             }
+            $ranqueamento->status = 1;
         }
 
         $ranqueamento->ano = $request->ano;
         $ranqueamento->tipo = $request->tipo;
-        $ranqueamento->status = $request->status;
         $ranqueamento->permitidos = Utils::limpa_string_de_codpes($request->permitidos);
         $ranqueamento->save();
 

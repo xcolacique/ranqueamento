@@ -5,6 +5,7 @@ namespace App\Service;
 use Uspdev\Replicado\DB;
 use App\Models\Declinio;
 use App\Models\Ranqueamento;
+use App\Models\Escolha;
 
 class Utils
 {
@@ -135,4 +136,18 @@ class Utils
         if($declinio) return true;
         return false;
     }
+
+    public static function escolha($prioridade){
+        $ranqueamento = Ranqueamento::where('status',1)->first();
+
+        $hab_id = Escolha::select('hab_id')
+                            ->where('ranqueamento_id',$ranqueamento->id)
+                            ->where('user_id',auth()->user()->id)
+                            ->where('prioridade',$prioridade)
+                            ->first();
+
+        if(!$hab_id) return 'Não definido';
+    }
+
+    
 }
