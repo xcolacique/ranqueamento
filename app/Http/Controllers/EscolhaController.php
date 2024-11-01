@@ -54,7 +54,23 @@ class EscolhaController extends Controller
             'habs' => [ 'required', new EscolhaRule], 
         ]);
 
-        foreach(array_filter($request->habs) as $prioridade=>$hab_id) {
+        $habs = array_filter($request->habs);
+
+        // deletando opções
+        $prioridades_salvas = Escolha::select('prioridade')
+            ->where('ranqueamento_id',$ranqueamento->id)
+            ->where('user_id', auth()->user()->id)
+            ->pluck('prioridade')
+            ->toArray();
+        $prioridades_escolhidas = array_keys($habs);
+
+        $prioridades_deletar = array_diff($prioridades_salvas,$prioridades_escolhidas);
+        Escolha::where('ranqueamento_id',$ranqueamento->id)
+                ->where('user_id', auth()->user()->id)
+                ->whereIn('prioridade', $prioridades_deletar)
+                ->delete();
+
+        foreach($habs as $prioridade=>$hab_id) {
             $escolha = Escolha::where('ranqueamento_id',$ranqueamento->id)
                                 ->where('user_id', auth()->user()->id)
                                 ->where('prioridade', $prioridade)
