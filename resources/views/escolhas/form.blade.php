@@ -29,7 +29,7 @@
                         <select class="form-control" id="select{{$prioridade}}" name="habs[{{$prioridade}}]">
                             <option value="" selected=""> - Selecione  -</option>
                             @foreach($habs as $hab)
-                                <option value="{{ $hab->id }}" @if($hab_id_salva==$hab->id or $hab_id_old==$hab->id) selected @endif>{{$hab->nomhab}} - {{$hab->perhab}}</option>
+                                <option value="{{ $hab->id }}" @if($hab_id_salva==$hab->id or $hab_id_old==$hab->id) selected @endif>{{$hab->nomhab}} - {{$hab->perhab}} (Vagas: {{$hab->vagas}})</option>
                             @endforeach
                         </select>
                     </div>

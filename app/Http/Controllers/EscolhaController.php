@@ -15,14 +15,14 @@ class EscolhaController extends Controller
 {
     public function index(Ranqueamento $ranqueamento){
         Gate::authorize('admin');
-        $ranqueamento = Ranqueamento::where('status',1)->first();
 
         $grouped = Escolha::where('ranqueamento_id',$ranqueamento->id)
                             ->get()
                             ->groupBy('user_id');
 
         return view('escolhas.index',[
-            'grouped' => $grouped
+            'grouped' => $grouped,
+            'ranqueamento' => $ranqueamento
         ]); 
     }
 

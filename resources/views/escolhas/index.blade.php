@@ -27,7 +27,7 @@
                 $user = \App\Models\User::find($first->user_id);
                 $nome = $user->name;
                 $codpes = $user->codpes;
-                if(\App\Service\Utils::declinou($first->user_id)) $declinou = 'sim';
+                if(\App\Service\Utils::declinou($first->user_id, $ranqueamento)) $declinou = 'sim';
             }
         
         @endphp
@@ -41,8 +41,8 @@
                     $escolha = $group->where('prioridade', $prioridade)->first();
                     $nomhab = '-';
                     if($escolha) {
-                        $hab = \App\Models\Hab::find($escolha->hab_id)->nomhab;
-                        $nomhab = str_replace('Bacharelado - Habilitação:','', $hab);
+                        $hab = \App\Models\Hab::find($escolha->hab_id);
+                        $nomhab = str_replace('Bacharelado - Habilitação:','', $hab->nomhab) . ' - ' . $hab->perhab;
                     }
                 @endphp
                 {{ $nomhab }}
