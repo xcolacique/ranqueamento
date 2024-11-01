@@ -129,10 +129,12 @@ class Utils
         return implode(',',$array);
     }
 
-    public static function declinou(){
+    public static function declinou($user_id = null){
+        if(is_null($user_id)) $user_id = auth()->user()->id;
+
         $ranqueamento = Ranqueamento::where('status',1)->first();
         $declinio = Declinio::where('ranqueamento_id',$ranqueamento->id)
-                            ->where('user_id',auth()->user()->id)->first();
+                            ->where('user_id',$user_id)->first();
 
         if($declinio) return true;
         return false;

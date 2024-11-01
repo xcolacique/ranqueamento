@@ -6,11 +6,6 @@ $admin = [
         'url' => config('app.url') .'/ranqueamentos',
         'can' => 'admin',
     ],
-    [
-        'text' => 'Ciclo Básico',
-        'url' => config('app.url') . '/admin/ciclo_basico',
-        'can' => 'admin',
-    ],
 ];
 
 $menu = [

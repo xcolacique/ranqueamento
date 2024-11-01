@@ -44,7 +44,10 @@
                     <div class="form-group">
                         <label for="permitidos">Autorizar discentes não aptos a participarem desse ranqueamento</label>
                         <textarea class="form-control" id="permitidos" rows="3">{{ old('permitidos') }}</textarea>
-                        <small>Digite os números USP separados por vírgula, exemplo: 123454,644332,2123445</small>
+                        <small>Digite os números USP separados por vírgula, exemplo: 123454,644332,2123445<br>
+                              <b>Importante</b>: para participar do ranqueamento como ingressante, o aluno deve estar matriculado
+                                 na habliticação do ciclo básico no jupiterweb.
+                        </small>
                     </div>
                     <br>                    
                     <div class="form-group">

@@ -2,13 +2,60 @@
 
 @section('content')
 
-<h1>Em construção</h1>
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th scope="col">Número USP</th>
+      <th scope="col">Nome</th>
+      <th scope="col">Declinou do português?</th>
+      @for($prioridade = 1; $prioridade <=7; $prioridade++)
+        <th>
+            Opção {{ $prioridade }}
+        </th>
+      @endfor
+    </tr>
+  </thead>
+  <tbody>
 
-@foreach($grouped as $group)
-    @foreach($group as $escolha)
-        {{ $escolha }}
+    @foreach($grouped as $group)
+        @php 
+            $nome = '-';
+            $codpes = '-';
+            $declinou = 'não';
+            $first = $group->first(); 
+            if($first) {
+                $user = \App\Models\User::find($first->user_id);
+                $nome = $user->name;
+                $codpes = $user->codpes;
+                if(\App\Service\Utils::declinou($first->user_id)) $declinou = 'sim';
+            }
+        
+        @endphp
+        <tr>
+        <td>{{ $nome }}</td>
+        <td>{{ $codpes }}</td>
+        <td>{{ $declinou }}</td>
+        @for($prioridade = 1; $prioridade <=7; $prioridade++)
+            <td>
+                @php 
+                    $escolha = $group->where('prioridade', $prioridade)->first();
+                    $nomhab = '-';
+                    if($escolha) {
+                        $hab = \App\Models\Hab::find($escolha->hab_id)->nomhab;
+                        $nomhab = str_replace('Bacharelado - Habilitação:','', $hab);
+                    }
+                @endphp
+                {{ $nomhab }}
+            </td>
+        @endfor
+        </tr>
     @endforeach
-@endforeach
+
+  </tbody>
+</table
+
+
+
 
 
 @endsection
