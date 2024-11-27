@@ -153,4 +153,25 @@ class Utils
         $hab = Hab::find($hab_id->hab_id);
         return $hab->nomhab . ' - ' . $hab->perhab;
     }
+
+    #fazer funcao para calcular nota
+    #and dtacrihst >= '2024-01-01'
+    public static function get_nota($codpes, $coddis){
+        $query = "SELECT notfim, notfim2, coddis
+        FROM HISTESCOLARGR 
+        WHERE codpes = $codpes AND coddis = '$coddis'
+        ";
+        $resultado = DB::fetch($query);
+
+        if($resultado != false){
+            if($resultado['notfim'] && !$resultado['notfim2']){ //nota única da matéria no semestre
+                return [$resultado['notfim'], $resultado['coddis']];
+            }elseif($resultado['notfim2']){ //nota da prova de recuperação
+                return [$resultado['notfim2'], $resultado['coddis']];
+            }elseif(!$resultado['notfim'] && !$resultado['notfim2']){ //não retornou nada/não fez a matéria
+                return [$resultado['notfim2'] = 0, $resultado['coddis']];
+            }
+        }
+    }
+
 }
