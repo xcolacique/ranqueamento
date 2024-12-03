@@ -2,7 +2,7 @@
 
 @section('content')
 
-<p><b>Nº USP: </b>{{$codpes}}</p>
+<p><b>Nº USP: </b>{{$user->codpes}}</p>
 <p><b>Nome: </b>{{$user->name}}</p>
 <!-- media query -->
 <link rel="stylesheet" href="{{ asset('css/style.css') }}"> 

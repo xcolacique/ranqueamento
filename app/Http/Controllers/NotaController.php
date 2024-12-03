@@ -12,11 +12,9 @@ class NotaController extends Controller
 {
     public function show($codpes){
     Gate::authorize('admin');
-
     foreach(Escolha::disciplinas() as $disciplina){
-        //transforma string em array
         $notas[] = Utils::get_nota($codpes, $disciplina); //$nota[1] é o coddis. $nota[0] é a nota.
-        $somente_notas = collect($notas)->pluck(0)->toArray(); //pluck(0) pega somente item 0 do array
+        $somente_notas = array_column($notas, 0);
     }
     //gerando variáveis para o blade. É necessário mostrar a soma das notas das disciplinas.
     $soma_notas = array_sum($somente_notas); 
@@ -24,9 +22,8 @@ class NotaController extends Controller
 
     foreach(Escolha::disciplinas_segundo() as $disciplina_dois){
         $notas_segundo[] = Utils::get_nota($codpes, $disciplina_dois);
-        $somente_notas2 = collect($notas_segundo)->pluck(0)->toArray();
+        $somente_notas2 = array_column($notas_segundo, 0);
     }
-
     //no array das disciplinas há itens vazios?
     $vazio = Escolha::verifica_null($notas_segundo);
     if($vazio){
@@ -40,10 +37,8 @@ class NotaController extends Controller
         $media_dois = $soma_notas2 * 2 / 4;
         $media_final = array_sum([$media_dois + $media_um]) / 3;
     }
-
         return view('notas.show', [
             'user' => User::where('codpes',$codpes)->first(),
-            'codpes' => $codpes,
             'notas' => $notas,
             'notas_segundo' => $notas_segundo,
             'soma_notas' => $soma_notas,
