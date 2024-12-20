@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\Ranqueamento;
 use App\Models\Hab;
 use App\Rules\CodpesRule;
-use App\Service\Utils;
+use App\Services\Utils;
 
 class RanqueamentoController extends Controller
 {
@@ -27,7 +27,7 @@ class RanqueamentoController extends Controller
         Gate::authorize('admin');
         return view('ranqueamentos.create',[
             'habs' => Utils::lista_habs(),
-        ]); 
+        ]);
     }
 
     public function store(Request $request)
@@ -35,9 +35,9 @@ class RanqueamentoController extends Controller
         Gate::authorize('admin');
 
         $request->validate([
-            'ano'        => [ 'required', 'between:2024,2100', 'integer', 
+            'ano'        => [ 'required', 'between:2024,2100', 'integer',
                                Rule::unique('ranqueamentos', 'ano')->where('tipo', $request->tipo)
-                            ], 
+                            ],
             'tipo'       => 'required', # TODO: validar somente ingressantes e reranqueamento
             'status'     => 'nullable', # só pode se nulo ou 1,
             'permitidos' => ['nullable', new CodpesRule]
@@ -85,7 +85,7 @@ class RanqueamentoController extends Controller
             }
          }
 
-        return redirect("/ranqueamentos"); 
+        return redirect("/ranqueamentos");
     }
 
     public function show(Ranqueamento $ranqueamento)
@@ -95,7 +95,7 @@ class RanqueamentoController extends Controller
         return view('ranqueamentos.show',[
             'ranqueamento' => $ranqueamento,
             'habs'         => $habs
-        ]); 
+        ]);
     }
 
     public function edit(Ranqueamento $ranqueamento)
@@ -105,17 +105,17 @@ class RanqueamentoController extends Controller
         return view('ranqueamentos.edit',[
             'ranqueamento' => $ranqueamento,
             'habs'         => $habs
-        ]); 
+        ]);
     }
     public function update(Request $request, Ranqueamento $ranqueamento)
     {
         Gate::authorize('admin');
 
         $request->validate([
-            'ano'        => [ 'required', 'between:2024,2100', 'integer', 
+            'ano'        => [ 'required', 'between:2024,2100', 'integer',
                                Rule::unique('ranqueamentos', 'ano')->where('tipo', $request->tipo)
                                ->ignore($ranqueamento->id)
-                            ], 
+                            ],
             'tipo'   => 'required', # TODO: validar somente ingressantes e reranqueamento
             'status' => 'nullable', # só pode se nulo ou 1
             'permitidos' => ['nullable', new CodpesRule]
@@ -158,7 +158,7 @@ class RanqueamentoController extends Controller
             }
         }
 
-        return redirect("/ranqueamentos"); 
+        return redirect("/ranqueamentos");
     }
 
     public function destroy(Ranqueamento $ranqueamento)
@@ -166,9 +166,9 @@ class RanqueamentoController extends Controller
         Gate::authorize('admin');
         // não vamos permitir por enquanto
         dd('Não permitido');
-        
+
         $ranqueamento->delete();
         request()->session()->flash('alert-info','Ranqueamento excluído com sucesso.');
-        return redirect("/ranqueamentos"); 
+        return redirect("/ranqueamentos");
     }
 }

@@ -1,12 +1,15 @@
 <?php
 
-namespace App\Service;
+namespace App\Services;
 
 use Uspdev\Replicado\DB;
 use App\Models\Declinio;
 use App\Models\Ranqueamento;
 use App\Models\Escolha;
 use App\Models\Hab;
+
+use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 
 class Utils
 {
@@ -27,10 +30,10 @@ class Utils
             AND (V.codcurgrd = 8051)
             AND YEAR(dtainivin) = {$ano}
             AND S.anosem = {$anosem}
-            AND (S.staalu = 'M' OR S.staalu = 'A' OR S.staalu = 'R') 
+            AND (S.staalu = 'M' OR S.staalu = 'A' OR S.staalu = 'R')
             ORDER BY V.nompes ASC
         ";
-        return DB::fetchAll($query);    
+        return DB::fetchAll($query);
     }
 
     // AND YEAR(V.dtainivin) = 2024
@@ -49,11 +52,11 @@ class Utils
             AND ((V.codhab=102 OR V.codhab=104) AND (S.codhab=102 OR S.codhab=104))
             AND (V.codcurgrd = 8051)
             AND S.anosem = {$anosem}
-            AND 
+            AND
                 (YEAR(dtainivin) <> {$ano} OR (S.staalu <> 'M' AND S.staalu <> 'A' AND S.staalu <> 'R'))
             ORDER BY V.nompes ASC
         ";
-        return DB::fetchAll($query);    
+        return DB::fetchAll($query);
     }
 
     public static function ciclo_basico_check(int $codpes, int $ano){
@@ -68,7 +71,7 @@ class Utils
             AND (V.codcurgrd = 8051)
             AND YEAR(dtainivin) = {$ano}
             AND S.anosem = {$anosem}
-            AND (S.staalu = 'M' OR S.staalu = 'A' OR S.staalu = 'R') 
+            AND (S.staalu = 'M' OR S.staalu = 'A' OR S.staalu = 'R')
             AND V.codpes = $codpes
         ";
         $record = DB::fetch($query);
@@ -129,17 +132,6 @@ class Utils
         return implode(',',$array);
     }
 
-    public static function declinou($user_id = null, $ranqueamento = null){
-        if(is_null($user_id)) $user_id = auth()->user()->id;
-        if(is_null($ranqueamento))  $ranqueamento = Ranqueamento::where('status',1)->first();
-       
-        $declinio = Declinio::where('ranqueamento_id',$ranqueamento->id)
-                            ->where('user_id',$user_id)->first();
-
-        if($declinio) return true;
-        return false;
-    }
-
     public static function escolha($prioridade){
         $ranqueamento = Ranqueamento::where('status',1)->first();
 
@@ -153,4 +145,84 @@ class Utils
         $hab = Hab::find($hab_id->hab_id);
         return $hab->nomhab . ' - ' . $hab->perhab;
     }
+
+
+    public static function getNotas(int $codpes, array $disciplinas) {
+        $disciplinas = implode(',', $disciplinas);
+
+        $query = "SELECT coddis, rstfim, notfim, notfim2, codpgm
+            FROM HISTESCOLARGR
+            WHERE codpgm = (
+                SELECT codpgm
+                FROM PROGRAMAGR
+                WHERE codpes = $codpes AND stapgm = 'A'
+            ) AND codpes = $codpes AND stamtr = 'M' AND coddis IN($disciplinas)";
+        $resultados = DB::fetchAll($query);
+
+        [$disciplinas, $aproveitamentos] = collect($resultados)->partition(function($disciplina) {
+            return $disciplina['rstfim'] <> 'D';
+        });
+
+        $notas = $disciplinas->map(function($disciplina) {
+            if($disciplina['notfim2'] === "") {
+                $nota = $disciplina['notfim'] ? $disciplina['notfim'] : 0;
+            }
+            else {
+                $nota = $disciplina['notfim2'] ? $disciplina['notfim2'] : 0;
+            }
+            return [
+                'coddis' => $disciplina['coddis'],
+                'nota'   => $nota
+            ];
+
+        });
+
+        $codpgm = $aproveitamentos->select('codpgm')->first();
+
+        $disciplinasAproveitamentos = $aproveitamentos->map(function($disciplina) {
+            return "'" . $disciplina['coddis'] . "'";
+        });
+
+        $notasEquivalencia = $disciplinasAproveitamentos->isEmpty() ? collect([]) :
+            self::getAproveitamentos($codpes, $codpgm['codpgm'], $disciplinasAproveitamentos->toArray());
+
+        return $notas->merge($notasEquivalencia);
+
+    }
+
+    private static function getAproveitamentos(int $codpes, int $codpgm, array $disciplinas) {
+        $disciplinas = implode(',', $disciplinas);
+
+        $query = "SELECT R.coddis, count(R.coddis) as qtdedisc, sum(H.notdisexr) as nota
+            FROM REQUERHISTESC R
+            INNER JOIN APROVEITEXTGR A ON (R.codrqm = A.codrqm)
+            INNER JOIN HISTESCOLAREXTGR H ON
+                (A.coduspdisexr = H.coduspdisexr AND R.codpes = H.codpes)
+            INNER JOIN DISCIPEXTGR D ON (H.coduspdisexr = D.coduspdisexr)
+            INNER JOIN ORGANIZACAO O ON (D.codorg = O.codorg)
+            WHERE R.codpes = $codpes AND R.codpgm = $codpgm AND R.coddis IN ($disciplinas)
+            GROUP BY R.coddis";
+
+        $aproveitamentos = DB::fetchAll($query);
+
+        return collect($aproveitamentos)->map(function ($aproveitamento) {
+            return [
+                'coddis' => $aproveitamento['coddis'],
+                'nota'   => $aproveitamento['nota'] / $aproveitamento['qtdedisc']
+            ];
+        });
+
+    }
+
+    public static function getMedia($notas) {
+        $soma1 = 0;
+        $disciplinas = Escolha::disciplinas();
+
+        [$primeiro, $segundo] = $notas->partition(function($nota) use($disciplinas) {
+            return in_array("'" . $nota['coddis'] . "'", $disciplinas);
+        });
+
+        return ((($primeiro->sum('nota') / 4) + ($segundo->sum('nota') / 2)) / 3);
+    }
+
 }
