@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Ranqueamento;
-use App\Service\Utils;
+use App\Services\Utils;
 
 class AdminController extends Controller
 {

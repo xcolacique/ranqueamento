@@ -17,4 +17,4 @@ Route::post('/escolhas',[EscolhaController::class, 'store'])->name('escolhas_sto
 Route::get('/escolhas/{ranqueamento}',[EscolhaController::class, 'index'])->name('escolhas_index');
 
 Route::get('/notas/{codpes}', [NotaController::class, 'show']);
-Route::get('/excel', [EscolhaController::class, 'excel']);
+Route::get('/excel/{ranqueamento}', [EscolhaController::class, 'excel']);

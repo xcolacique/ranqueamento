@@ -5,7 +5,7 @@
 <p><b>Nº USP: </b>{{$user->codpes}}</p>
 <p><b>Nome: </b>{{$user->name}}</p>
 <!-- media query -->
-<link rel="stylesheet" href="{{ asset('css/style.css') }}"> 
+<link rel="stylesheet" href="{{ asset('css/style.css') }}">
 
 <div class="row" style="margin:8px;">
     <table class="table table-striped" style="width:25%; margin-right:10px;">
@@ -19,7 +19,7 @@
         </tr>
         @foreach($notas as $nota)
         <tr>
-        <th scope="row">{{$nota[1]}}</th>
+        <th scope="row">{{ $nota[1] }}</th>
         <td>{{$nota[0]}} +</td>
         </tr>
         @endforeach

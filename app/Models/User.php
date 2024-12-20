@@ -8,6 +8,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use \Spatie\Permission\Traits\HasRoles;
 use \Uspdev\SenhaunicaSocialite\Traits\HasSenhaunica;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable
 {
@@ -47,4 +49,16 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function declinios(): HasMany
+    {
+        return $this->hasMany(Declinio::class);
+    }
+
+    public function escolhas(): HasMany
+    {
+        return $this->hasMany(Escolha::class);
+    }
+
+
 }
