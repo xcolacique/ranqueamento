@@ -25,7 +25,7 @@
           <td><a href="notas/{{ $group['codpes'] }}">{{ $group['name'] }}</a></td>
           <td>{{ $group['codpes'] }}</td>
           <td>{{ $group['declinou'] }}</td>
-          <td>{{ $group['media'] }}</td>
+          <td>{{ number_format($group['media'], 2, ',') }}</td>
           <td>{{ $group['nomhab1'] }}</td>
           <td>{{ $group['nomhab2'] }}</td>
           <td>{{ $group['nomhab3'] }}</td>

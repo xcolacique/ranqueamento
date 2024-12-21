@@ -215,7 +215,6 @@ class Utils
     }
 
     public static function getMedia($notas) {
-        $soma1 = 0;
         $disciplinas = Escolha::disciplinas();
 
         [$primeiro, $segundo] = $notas->partition(function($nota) use($disciplinas) {

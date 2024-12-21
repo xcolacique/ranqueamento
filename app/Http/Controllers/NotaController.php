@@ -18,12 +18,7 @@ class NotaController extends Controller
         return view('notas.show', [
             'user' => User::where('codpes',$codpes)->first(),
             'notas' => $notas,
-            'notas_segundo' => $notas_segundo,
-            'soma_notas' => $soma_notas,
-            'soma_notas2' => $soma_notas2,
-            'media_um' => $media_um,
-            'media_dois' => $media_dois,
-            'media_final' => $media_final
+            'media' => $media,
         ]);
     }
 }
