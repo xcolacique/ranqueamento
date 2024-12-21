@@ -7,9 +7,12 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\RanqueamentoController;
 use App\Http\Controllers\EscolhaController;
 use App\Http\Controllers\NotaController;
+use App\Http\Controllers\ScoreController;
 
 Route::get('/',[IndexController::class, 'index']);
+
 Route::resource('/ranqueamentos',RanqueamentoController::class);
+
 Route::get('/admin/ciclo_basico',[AdminController::class, 'ciclo_basico'])->name('ciclo_basico');
 Route::post('/declinar',[EscolhaController::class, 'declinar'])->name('declinar');
 Route::get('/escolhas',[EscolhaController::class, 'form'])->name('escolhas_form');
@@ -18,3 +21,7 @@ Route::get('/escolhas/{ranqueamento}',[EscolhaController::class, 'index'])->name
 
 Route::get('/notas/{codpes}', [NotaController::class, 'show']);
 Route::get('/excel/{ranqueamento}', [EscolhaController::class, 'excel']);
+
+Route::get('/scores/{ranqueamento}', [ScoreController::class, 'show']);
+
+
