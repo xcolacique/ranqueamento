@@ -164,11 +164,10 @@ class Utils
         });
 
         $notas = $disciplinas->map(function($disciplina) {
-            if($disciplina['notfim2'] === "") {
-                $nota = $disciplina['notfim'] ? $disciplina['notfim'] : 0;
-            }
-            else {
-                $nota = $disciplina['notfim2'] ? $disciplina['notfim2'] : 0;
+            $nota = $disciplina['notfim'] ? $disciplina['notfim'] : 0;
+            // vale a maior nota entre notfim e notfim2
+            if($disciplina['notfim2'] &&  $disciplina['notfim2'] > $nota){
+                $nota = $disciplina['notfim2'];
             }
             return [
                 'coddis' => $disciplina['coddis'],
