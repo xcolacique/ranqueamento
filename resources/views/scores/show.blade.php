@@ -13,7 +13,6 @@
         <th scope="col">Média</th>
         <th scope="col">Número USP</th>
         <th scope="col">Nome</th>
-        <th scope="col">Opção</th>
         </tr>
     </thead>
     <tbody>
@@ -22,7 +21,6 @@
             <td>{{ number_format($score->nota, 2, ',') }}</td>
             <td>{{ $score->user->codpes }}</td>
             <td>{{ $score->user->name }}</td>
-            <td>{{ $score->prioridade_eleita }}</td>
         </tr>
         @endforeach
     </tbody>

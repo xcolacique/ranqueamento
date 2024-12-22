@@ -45,11 +45,15 @@ class ScoreController extends Controller
             $score->save();
         }
 
-        // classificando para cada habilitação
+        $vagas = [];
         foreach($ranqueamento->habs as $hab){
-            $vagas = $hab->vagas;
-            for ($prioridade = 1; $prioridade <= 7; $prioridade++) { 
-                if($vagas == 0 ) break;
+            $vagas[$hab->id] = $hab->vagas;
+        }
+
+        // classificando para cada habilitação
+        for ($prioridade = 1; $prioridade <= 7; $prioridade++) {
+            foreach($ranqueamento->habs as $hab){
+                //if($vagas[$hab->id] == 0 ) break;
 
                 // Candidatos que já foram alocados em alguma habilitação
                 $candidatos_alocados = Score::whereNotNull('hab_id_eleita')
@@ -78,7 +82,7 @@ class ScoreController extends Controller
 
                 $alocados = $inscritos->where('prioridade', $prioridade)
                                     ->sortByDesc('nota')
-                                    ->slice(0,$vagas)
+                                    ->slice(0,$vagas[$hab->id])
                                     ->pluck('user_id')
                                     ->toArray();
 
@@ -91,7 +95,7 @@ class ScoreController extends Controller
                     $score->save();
                 }
 
-                $vagas = $vagas - count($alocados);
+                $vagas[$hab->id] = $vagas[$hab->id] - count($alocados);
             }
         }
 
