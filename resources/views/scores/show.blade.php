@@ -19,7 +19,7 @@
     </thead>
     <tbody>
         @php $row_number = 1; @endphp
-        @foreach($scores->where('hab_id_eleita', $hab->id)->sortBy('prioridade_eleita') as $score)
+        @foreach($scores->where('hab_id_eleita', $hab->id)->sortByDesc('nota') as $score)
         <tr>
             <td>{{ $row_number }}</td>
             <td>{{ number_format($score->nota, 2, ',') }}</td>

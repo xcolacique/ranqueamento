@@ -41,69 +41,48 @@ class ScoreController extends Controller
             // vamos zerar 
             $score->hab_id_eleita = null;
             $score->prioridade_eleita = null;
-
             $score->save();
         }
 
+        // Controlando as vagas ainda disponíveis para cada habilitação
         $vagas = [];
         foreach($ranqueamento->habs as $hab){
             $vagas[$hab->id] = $hab->vagas;
         }
 
-        // classificando para cada habilitação
-        for ($prioridade = 1; $prioridade <= 7; $prioridade++) {
-            foreach($ranqueamento->habs as $hab){
-                //if($vagas[$hab->id] == 0 ) break;
+        // para cada candidato, da maior média para a menos, vamos alocando nas habilitações
+        foreach(Score::orderBy('nota','DESC')->get() as $score){
+            // vamos varrer cada prioridade e verificar se o aluno tem nota suficiente para entrar em alguma habilitação
+            for($prioridade = 1; $prioridade <= 7; $prioridade++) {
 
-                // Candidatos que já foram alocados em alguma habilitação
+                // Candidatos que já foram alocados em alguma habilitação e vamos ignorar
                 $candidatos_alocados = Score::whereNotNull('hab_id_eleita')
                                             ->whereNotNull('prioridade_eleita')
                                             ->pluck('user_id')
                                             ->toArray();
-                // todos candidatos inscritos nessa habilitação, nessa prioridade e ainda não alocados
-                $inscritos = Escolha::where('hab_id', $hab->id)
+
+                // Escolhas para o cadidato em questão, caso ele ainda não tenha sido alocado
+                $escolha = Escolha::where('ranqueamento_id',$ranqueamento->id)
+                                    ->where('user_id', $score->user_id)
                                     ->where('prioridade', $prioridade)
                                     ->whereNotIn('user_id',$candidatos_alocados)
-                                    ->get();
-
-                // coleção $inscritos para fazer a classificação               
-                $inscritos = $inscritos->map(function($inscrito) use ($hab, $prioridade, $ranqueamento){
-                    $score = Score::where('user_id', $inscrito->user_id)
-                        ->where('ranqueamento_id',$ranqueamento->id)
-                        ->first();
-
-                    return [
-                        'user_id'    => $inscrito->user_id,
-                        'prioridade' => $inscrito->prioridade,
-                        'nota' => $score->nota,
-                    ];
-
-                });
-
-                $alocados = $inscritos->where('prioridade', $prioridade)
-                                    ->sortByDesc('nota')
-                                    ->slice(0,$vagas[$hab->id])
-                                    ->pluck('user_id')
-                                    ->toArray();
-
-                foreach($alocados as $alocado) {
-                    $score = Score::where('user_id', $alocado)
-                                    ->where('ranqueamento_id',$ranqueamento->id)
                                     ->first();
-                    $score->hab_id_eleita = $hab->id;
+
+                // Se o candidado escolheu uma habilitação nessa prioridade e ainda não tem habilitação
+                // E se ainda tem vaga nessa habilitação
+                if($escolha && $vagas[$escolha->hab->id]>0) {
+                    $score->hab_id_eleita = $escolha->hab->id;
                     $score->prioridade_eleita = $prioridade;
                     $score->save();
-                }
+                    $vagas[$escolha->hab->id] = $vagas[$escolha->hab->id] - 1;
 
-                $vagas[$hab->id] = $vagas[$hab->id] - count($alocados);
+                }
             }
         }
 
         $scores = Score::where('ranqueamento_id',$ranqueamento->id)
-                            ->orderBy('prioridade_eleita', 'ASC')
-                            ->orderBy('nota', 'DESC')
-                            ->get();
-
+                        ->orderBy('nota','DESC')
+                        ->get();
 
         return view('scores.show', [
             'scores' => $scores,
