@@ -22,6 +22,9 @@ Route::get('/escolhas/{ranqueamento}',[EscolhaController::class, 'index'])->name
 Route::get('/notas/{codpes}', [NotaController::class, 'show']);
 Route::get('/excel/{ranqueamento}', [EscolhaController::class, 'excel']);
 
+Route::get('/scores/csv/{ranqueamento}', [ScoreController::class, 'csv']);
 Route::get('/scores/{ranqueamento}', [ScoreController::class, 'show']);
+Route::post('/scores/{ranqueamento}', [ScoreController::class, 'update']);
+
 
 
