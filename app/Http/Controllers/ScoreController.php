@@ -25,8 +25,8 @@ class ScoreController extends Controller
 
         // salvando só os estudantes que vão participar desse ranqueamento
         foreach($candidatos as $candidato) {
-            #$notas = Utils::getNotas($candidato->user->codpes, array_merge(Escolha::disciplinas(),Escolha::disciplinas_segundo()));
-            #$media = Utils::getMedia($notas);
+            $notas = Utils::getNotas($candidato->user->codpes, array_merge(Escolha::disciplinas(),Escolha::disciplinas_segundo()));
+            $media = Utils::getMedia($notas);
 
             $score = Score::where('user_id', $candidato->user_id)
                             ->where('ranqueamento_id',$ranqueamento->id)
@@ -35,7 +35,7 @@ class ScoreController extends Controller
             if(!$score) $score = new Score;
 
             $score->user_id = $candidato->user_id;
-            #$score->nota = $media;
+            $score->nota = $media;
             $score->ranqueamento_id = $ranqueamento->id;
 
             // vamos zerar 
