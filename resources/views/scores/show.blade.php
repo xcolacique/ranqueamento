@@ -3,7 +3,14 @@
 
 @section('content')
 
-@foreach($habs as $hab)
+<form method="POST" action="/scores/{{ $ranqueamento->id }}">
+@csrf
+<button type="submit" class="btn btn-success">Carregar novas notas do jupiterweb</button>
+</form>
+<br>
+<a href="/scores/csv/{{ $ranqueamento->id }}" class="btn btn-success">Exportar para csv</a>
+
+@foreach($ranqueamento->habs as $hab)
     <hr>
     <p style="text-align: center; font-weight: bold;">{{ $hab->nomhab }} - {{ $hab->perhab }}</p>
 
@@ -19,7 +26,7 @@
     </thead>
     <tbody>
         @php $row_number = 1; @endphp
-        @foreach($scores->where('hab_id_eleita', $hab->id)->sortBy('prioridade_eleita') as $score)
+        @foreach($scores->where('hab_id_eleita', $hab->id)->sortByDesc('nota') as $score)
         <tr>
             <td>{{ $row_number }}</td>
             <td>{{ number_format($score->nota, 2, ',') }}</td>

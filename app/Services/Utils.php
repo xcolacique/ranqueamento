@@ -92,8 +92,8 @@ class Utils
         return DB::fetchAll($query);
     }
 
-    public static function periodo(){
-        $codpes = auth()->user()->codpes;
+    public static function periodo($codpes = null){
+        if(is_null($codpes)) $codpes = auth()->user()->codpes;
 
         $query = "SELECT V.codhab
         FROM VINCULOPESSOAUSP V
@@ -114,12 +114,10 @@ class Utils
             FROM CURSOGR C, HABILITACAOGR H
             WHERE C.codclg = 8
             AND C.codcur = 8051
-            AND H.nomhab NOT LIKE '%Portugu%'
             AND H.tiphab = 'I'
             AND C.codcur = H.codcur
             AND H.codhab = $codhab
             AND ( (H.dtaatvhab IS NOT NULL) AND (H.dtadtvhab IS NULL) )
-            ORDER BY H.nomhab ASC
         ";
         return DB::fetch($query);
     }
@@ -146,6 +144,14 @@ class Utils
         return $hab->nomhab . ' - ' . $hab->perhab;
     }
 
+    public static function get_codpgm(int $codpes) {
+        $query = "SELECT codpgm
+                    FROM PROGRAMAGR
+                    WHERE codpes = $codpes AND stapgm = 'A'";
+        $result = DB::fetch($query);
+        if($result) return $result['codpgm'];
+        return null;
+    }
 
     public static function getNotas(int $codpes, array $disciplinas) {
         $disciplinas = implode(',', $disciplinas);

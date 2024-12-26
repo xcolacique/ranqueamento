@@ -18,4 +18,9 @@ class Score extends Model
     {
         return $this->belongsTo(Ranqueamento::class);
     }
+
+    public function hab(): BelongsTo
+    {
+        return $this->belongsTo(Hab::class, 'hab_id_eleita', 'id');
+    }
 }
