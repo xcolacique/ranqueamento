@@ -10,19 +10,19 @@ class Escolha extends Model
     #ver possibilidade de trazer os dados do replicado
     public static function disciplinas(){ //primeiro semestre
         return [
-            "'FLC0112'",
-            "'FLC0114'",
-            "'FLL0433'",
-            "'FLT0123'",
+            "FLC0112",
+            "FLC0114",
+            "FLL0433",
+            "FLT0123",
         ];
     }
 
     public static function disciplinas_segundo(){ //segundo semestre
         return [
-            "'FLC0113'",
-            "'FLC0115'",
-            "'FLL0434'",
-            "'FLT0124'"
+            "FLC0113",
+            "FLC0115",
+            "FLL0434",
+            "FLT0124"
         ];
     }
     /*

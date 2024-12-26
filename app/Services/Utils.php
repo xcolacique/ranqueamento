@@ -10,6 +10,9 @@ use App\Models\Hab;
 
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
+use App\Actions\DispensaExterna;
+use App\Actions\DispensaUSP;
+use App\Actions\MaiorNota;
 
 class Utils
 {
@@ -154,7 +157,9 @@ class Utils
     }
 
     public static function getNotas(int $codpes, array $disciplinas) {
-        $disciplinas = implode(',', $disciplinas);
+        $disciplinas = collect($disciplinas)->map(function($disciplina) {
+                return "'" . $disciplina . "'";
+            })->implode(',', $disciplinas);
 
         $query = "SELECT coddis, rstfim, notfim, notfim2, codpgm
             FROM HISTESCOLARGR
@@ -170,63 +175,39 @@ class Utils
         });
 
         $notas = $disciplinas->map(function($disciplina) {
-            $nota = $disciplina['notfim'] ? $disciplina['notfim'] : 0;
-            // vale a maior nota entre notfim e notfim2
-            if($disciplina['notfim2'] &&  $disciplina['notfim2'] > $nota){
-                $nota = $disciplina['notfim2'];
-            }
             return [
                 'coddis' => $disciplina['coddis'],
-                'nota'   => $nota
+                'nota'   => MaiorNota::handle($disciplina)
             ];
 
         });
 
         $codpgm = $aproveitamentos->select('codpgm')->first();
 
-        $disciplinasAproveitamentos = $aproveitamentos->map(function($disciplina) {
-            return $disciplina['coddis'];
-        });
-
-        $notasEquivalencia = $disciplinasAproveitamentos->isEmpty() ? collect([]) :
-            self::getAproveitamentos($codpes, $codpgm['codpgm'], $disciplinasAproveitamentos->toArray());
+        $notasEquivalencia = $aproveitamentos->isEmpty() ? collect([]) :
+            self::getAproveitamentos($codpes, $codpgm['codpgm']);
 
         return $notas->merge($notasEquivalencia);
 
     }
 
-    private static function getAproveitamentos(int $codpes, int $codpgm, array $disciplinas) {
-        dump($disciplinas);
+    private static function getAproveitamentos(int $codpes, int $codpgm) {
 
-        $requerimento = "SELECT R.coddis, R2.tiprqm from REQUERHISTESC R
-                         INNER JOIN REQUERIMENTOGR R2 on (R.codrqm = R2.codrqm)
-                         WHERE R2.codpes=10733834 AND R2.codpgm = 2 AND R2.rstfim = 'D'
-                         AND R2.starqm = 'C' AND R2.tiprqm IN ('Dispensa Externa','Dispensa USP')";
+        $requerimento = "SELECT R2.coddis, R.tiprqm, R.codrqm FROM REQUERIMENTOGR R
+                         INNER JOIN REQUERHISTESC R2 ON (R.codrqm = R2.codrqm)
+                         WHERE R.codpes = $codpes AND R.codpgm = $codpgm AND R.rstfim = 'D'
+                         AND R.starqm = 'C' AND R.tiprqm IN ('Dispensa Externa','Dispensa USP')";
 
         $requerimentos = DB::fetchAll($requerimento);
-        ($externos, $internos) = $requerimentos->map(function($requerimento) {
+
+        [$rqmExternos, $rqmInternos] = collect($requerimentos)->partition(function($requerimento) {
+            return $requerimento['tiprqm'] === 'Dispensa Externa';
         });
-        dd($requerimentos);
 
-        $disciplinas = implode(',', $disciplinas);
+        $externo = $rqmExternos->isEmpty() ? collect([]) : DispensaExterna::handle($codpes, $codpgm, $rqmExternos);
+        $interno = $rqmInternos->isEmpty() ? collect([]) : DispensaUSP::handle($codpes, $rqmInternos);
 
-        $query = "SELECT R.coddis, count(R.coddis) as qtdedisc, sum(H.notdisexr) as nota
-            FROM REQUERHISTESC R
-            INNER JOIN REQUERIMENTOGR R2 ON (R.codrqm = R2.codrqm)
-            INNER JOIN APROVEITEXTGR A ON (R.codrqm = A.codrqm)
-            INNER JOIN HISTESCOLAREXTGR H ON
-                (A.coduspdisexr = H.coduspdisexr AND R.codpes = H.codpes)
-            WHERE R.codpes = $codpes AND R.codpgm = $codpgm and R2.rstfim = 'D' and R2.starqm = 'C' AND R.coddis IN ($disciplinas)
-            GROUP BY R.coddis";
-
-        $aproveitamentos = DB::fetchAll($query);
-
-        return collect($aproveitamentos)->map(function ($aproveitamento) {
-            return [
-                'coddis' => $aproveitamento['coddis'],
-                'nota'   => $aproveitamento['nota'] / $aproveitamento['qtdedisc']
-            ];
-        });
+        return $externo->merge($interno);
 
     }
 
@@ -234,7 +215,7 @@ class Utils
         $disciplinas = Escolha::disciplinas();
 
         [$primeiro, $segundo] = $notas->partition(function($nota) use($disciplinas) {
-            return in_array("'" . $nota['coddis'] . "'", $disciplinas);
+            return in_array($nota['coddis'], $disciplinas);
         });
 
         return ((($primeiro->sum('nota') / 4) + ($segundo->sum('nota') / 2)) / 3);
