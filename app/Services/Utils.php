@@ -179,7 +179,7 @@ class Utils
         $codpgm = $aproveitamentos->select('codpgm')->first();
 
         $disciplinasAproveitamentos = $aproveitamentos->map(function($disciplina) {
-            return "'" . $disciplina['coddis'] . "'";
+            return $disciplina['coddis'];
         });
 
         $notasEquivalencia = $disciplinasAproveitamentos->isEmpty() ? collect([]) :
@@ -190,16 +190,27 @@ class Utils
     }
 
     private static function getAproveitamentos(int $codpes, int $codpgm, array $disciplinas) {
+        dump($disciplinas);
+
+        $requerimento = "SELECT R.coddis, R2.tiprqm from REQUERHISTESC R
+                         INNER JOIN REQUERIMENTOGR R2 on (R.codrqm = R2.codrqm)
+                         WHERE R2.codpes=10733834 AND R2.codpgm = 2 AND R2.rstfim = 'D'
+                         AND R2.starqm = 'C' AND R2.tiprqm IN ('Dispensa Externa','Dispensa USP')";
+
+        $requerimentos = DB::fetchAll($requerimento);
+        ($externos, $internos) = $requerimentos->map(function($requerimento) {
+        });
+        dd($requerimentos);
+
         $disciplinas = implode(',', $disciplinas);
 
         $query = "SELECT R.coddis, count(R.coddis) as qtdedisc, sum(H.notdisexr) as nota
             FROM REQUERHISTESC R
+            INNER JOIN REQUERIMENTOGR R2 ON (R.codrqm = R2.codrqm)
             INNER JOIN APROVEITEXTGR A ON (R.codrqm = A.codrqm)
             INNER JOIN HISTESCOLAREXTGR H ON
                 (A.coduspdisexr = H.coduspdisexr AND R.codpes = H.codpes)
-            INNER JOIN DISCIPEXTGR D ON (H.coduspdisexr = D.coduspdisexr)
-            INNER JOIN ORGANIZACAO O ON (D.codorg = O.codorg)
-            WHERE R.codpes = $codpes AND R.codpgm = $codpgm AND R.coddis IN ($disciplinas)
+            WHERE R.codpes = $codpes AND R.codpgm = $codpgm and R2.rstfim = 'D' and R2.starqm = 'C' AND R.coddis IN ($disciplinas)
             GROUP BY R.coddis";
 
         $aproveitamentos = DB::fetchAll($query);
