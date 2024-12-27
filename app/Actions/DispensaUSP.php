@@ -13,7 +13,6 @@ class DispensaUSP
      */
     public static function handle(int $codpes, $rqmInternos)
     {
-        dump($codpes);
         $requerimentos = $rqmInternos->map(function($requerimento) {
             return $requerimento['codrqm'];
         })->implode(', ');
