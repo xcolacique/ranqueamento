@@ -28,17 +28,10 @@ class DispensaUSP
             $resultados[] = NotaUSP::handle($codpes, $coddisAtual[0], $aproveitamento['codpgm'], $aproveitamento['codtur'], $aproveitamento['coddis']);
         }
 
-        $grouped = collect($resultados)->groupBy('coddis');
-        $disciplinas = $grouped->map(function($item) {
-            if (count($item) > 1) {
-                return [
-                    'coddis' => $item[0]['coddis'],
-                    'nota' => $item->avg('nota')
-                ];
-            }
+        $disciplinas = collect($resultados)->groupBy('coddis')->map(function($item) {
             return [
                 'coddis' => $item[0]['coddis'],
-                'nota'   => $item[0]['nota']
+                'nota'   => (count($item) > 1) ? $item->avg('nota') : $item[0]['nota']
             ];
         });
 
