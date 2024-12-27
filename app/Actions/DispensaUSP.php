@@ -13,11 +13,12 @@ class DispensaUSP
      */
     public static function handle(int $codpes, $rqmInternos)
     {
+        dump($codpes);
         $requerimentos = $rqmInternos->map(function($requerimento) {
             return $requerimento['codrqm'];
         })->implode(', ');
 
-        $query = "SELECT codpgm, coddis, codtur
+        $query = "SELECT codpgm, coddis, codtur, codrqm
                   FROM APROVEITINTGR
                   where codpes = $codpes and codrqm IN ($requerimentos)";
         $aproveitamentos = DB::fetchAll($query);
