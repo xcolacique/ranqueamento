@@ -52,8 +52,10 @@ class ScoreController extends Controller
 
         // Controlando as vagas ainda disponíveis para cada habilitação
         $vagas = [];
+        $posicao = [];
         foreach($ranqueamento->habs as $hab){
             $vagas[$hab->id] = $hab->vagas;
+            $posicao[$hab->id] = 1;
         }
 
         // para cada candidato, da maior média para a menor, vamos alocando nas habilitações
@@ -79,8 +81,10 @@ class ScoreController extends Controller
                 if($escolha && $vagas[$escolha->hab->id]>0) {
                     $score->hab_id_eleita = $escolha->hab->id;
                     $score->prioridade_eleita = $prioridade;
+                    $score->posicao = $posicao[$escolha->hab->id];
                     $score->save();
                     $vagas[$escolha->hab->id] = $vagas[$escolha->hab->id] - 1;
+                    $posicao[$escolha->hab->id] = $posicao[$escolha->hab->id] + 1;
                 }
             }
         }

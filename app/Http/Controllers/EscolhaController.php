@@ -33,7 +33,7 @@ class EscolhaController extends Controller
             HabilitacaoService::options($ranqueamento->id)->toArray(),
             HabilitacaoService::headings()
         );
-        return $excel->download($export, 'lista_de_nomes.xlsx');
+        return $excel->download($export, 'ranqueamento' . date('Y') . '.xlsx');
     }
 
     public function form(){

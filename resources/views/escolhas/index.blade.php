@@ -9,6 +9,8 @@
       <th scope="col">Número USP</th>
       <th scope="col">Declinou do português?</th>
       <th scope="col">Média</th>
+      <th scope="col">Classificação</th>
+      <th scope="col">Opção eleita</th>
       @for($prioridade = 1; $prioridade <=7; $prioridade++)
         <th>
             Opção {{ $prioridade }}
@@ -26,13 +28,15 @@
           <td>{{ $group['codpes'] }}</td>
           <td>{{ $group['declinou'] }}</td>
           <td>{{ number_format($group['media'], 2, ',') }}</td>
-          <td>{{ $group['nomhab1'] }}</td>
-          <td>{{ $group['nomhab2'] }}</td>
-          <td>{{ $group['nomhab3'] }}</td>
-          <td>{{ $group['nomhab4'] }}</td>
-          <td>{{ $group['nomhab5'] }}</td>
-          <td>{{ $group['nomhab6'] }}</td>
-          <td>{{ $group['nomhab7'] }}</td>
+          <td>{{ $group['classificacao'] }}</td>
+          <td>{{ $group['prioridade_classificacao'] }}</td>
+          <td>{!! $group['nomhab1'] !!}</td>
+          <td>{!! $group['nomhab2'] !!}</td>
+          <td>{!! $group['nomhab3'] !!}</td>
+          <td>{!! $group['nomhab4'] !!}</td>
+          <td>{!! $group['nomhab5'] !!}</td>
+          <td>{!! $group['nomhab6'] !!}</td>
+          <td>{!! $group['nomhab7'] !!}</td>
         </tr>
     @endforeach
 

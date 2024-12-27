@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Declinio;
 use App\Models\Escolha;
 use App\Models\User;
+use App\Models\Score;
 use Illuminate\Database\Eloquent\Builder;
 
 class HabilitacaoService
@@ -26,24 +27,35 @@ class HabilitacaoService
             ->select(['id','codpes','name'])
             ->orderBy('name')
             ->get()
-            ->map(function($aluno) use($declinios, $escolhas) {
+            ->map(function($aluno) use($declinios, $escolhas, $ranqueamento_id) {
 
-                $notas = Utils::getNotas($aluno->codpes, array_merge(Escolha::disciplinas(),Escolha::disciplinas_segundo()));
+                $score = Score::where('codpes',$aluno->codpes)
+                                ->where('ranqueamento_id',$ranqueamento_id)
+                                ->first();
 
                 $aluno = [
                     'id' => $aluno->id,
                     'codpes' => $aluno->codpes,
                     'name' => $aluno->name,
                     'declinou' => $declinios->contains($aluno->id) ? 'sim' : 'não',
-                    'media' => Utils::getMedia($notas)
+                    'media' => $score->nota,
+                    'classificacao' => $score->hab ? $score->hab->nomhab: '',
+                    'prioridade_classificacao' => $score->prioridade_eleita
                 ];
 
                 $habilitacoes = $escolhas->where('user_id', $aluno['id']);
 
                 for ($prioridade = 1; $prioridade <= 7; $prioridade++) {
                     $habilitacao = $habilitacoes->where('prioridade', $prioridade)->first();
-                    $aluno['nomhab' . $prioridade] = $habilitacao ?
-                        $habilitacao->hab->nomhab . ' - ' . $habilitacao->hab->perhab : '-';
+                    if($habilitacao) {
+                        $aluno['nomhab' . $prioridade] = $habilitacao->hab->nomhab . ' - ' . $habilitacao->hab->perhab;
+                        if($prioridade == $score->prioridade_eleita) {
+                            $aluno['nomhab' . $prioridade] = "<span style='color:red;'>{$aluno['nomhab' . $prioridade]}</span>";
+                        }
+                    } else {
+                        $aluno['nomhab' . $prioridade] = '-';
+                    }
+
                 }
 
                 return $aluno;
@@ -60,6 +72,8 @@ class HabilitacaoService
             'Nome',
             'Declinou do Português?',
             'Média',
+            'Classificação',
+            'Opção Eleita',
             'Opção 1',
             'Opção 2',
             'Opção 3',
