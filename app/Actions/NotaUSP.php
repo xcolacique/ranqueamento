@@ -10,7 +10,7 @@ class NotaUSP
     /**
      * Retorna a disciplina e a maior nota do Aproveitamento USP
      */
-    public static function handle(int $codpes, int $codpgm, string $codtur, string $coddis)
+    public static function handle(int $codpes, string $coddisAtual, int $codpgm, string $codtur, string $coddis)
     {
         $query = "SELECT coddis, notfim, notfim2
             FROM HISTESCOLARGR
@@ -21,7 +21,7 @@ class NotaUSP
         $disciplina =  DB::fetch($query);
 
         return [
-            'coddis' => $disciplina['coddis'],
+            'coddis' => $coddisAtual,
             'nota'   => MaiorNota::handle($disciplina)
         ];
     }
