@@ -32,16 +32,22 @@ class HabilitacaoService
                 $score = Score::where('codpes',$aluno->codpes)
                                 ->where('ranqueamento_id',$ranqueamento_id)
                                 ->first();
-
+    
                 $aluno = [
                     'id' => $aluno->id,
                     'codpes' => $aluno->codpes,
                     'name' => $aluno->name,
                     'declinou' => $declinios->contains($aluno->id) ? 'sim' : 'não',
-                    'media' => $score->nota,
-                    'classificacao' => $score->hab ? $score->hab->nomhab: '',
-                    'prioridade_classificacao' => $score->prioridade_eleita
+                    'media' => 0,
+                    'classificacao' => '',
+                    'prioridade_classificacao' => ''
                 ];
+
+                if($score) {
+                    $aluno['media'] = $score->nota;
+                    $aluno['classificacao'] = $score->hab ? $score->hab->nomhab: $score->hab;
+                    $aluno['prioridade_classificacao'] = $score->prioridade_eleita;
+                }
 
                 $habilitacoes = $escolhas->where('user_id', $aluno['id']);
 
@@ -49,13 +55,9 @@ class HabilitacaoService
                     $habilitacao = $habilitacoes->where('prioridade', $prioridade)->first();
                     if($habilitacao) {
                         $aluno['nomhab' . $prioridade] = $habilitacao->hab->nomhab . ' - ' . $habilitacao->hab->perhab;
-                        if($prioridade == $score->prioridade_eleita) {
-                            $aluno['nomhab' . $prioridade] = "<span style='color:red;'>{$aluno['nomhab' . $prioridade]}</span>";
-                        }
                     } else {
                         $aluno['nomhab' . $prioridade] = '-';
                     }
-
                 }
 
                 return $aluno;

@@ -161,6 +161,19 @@ class RanqueamentoController extends Controller
         return redirect("/ranqueamentos");
     }
 
+    public function ciclo_basico(Ranqueamento $ranqueamento){
+
+        Gate::authorize('admin');
+
+        $ciclo_basico_elegiveis = Utils::ciclo_basico_elegiveis($ranqueamento->ano);
+        $ciclo_basico_nao_elegiveis = Utils::ciclo_basico_nao_elegiveis($ranqueamento->ano);
+
+        return view('ranqueamentos.ciclo_basico', [
+            'ciclo_basico_elegiveis' => $ciclo_basico_elegiveis,
+            'ciclo_basico_nao_elegiveis' => $ciclo_basico_nao_elegiveis,
+        ]);
+    }
+
     public function destroy(Ranqueamento $ranqueamento)
     {
         Gate::authorize('admin');

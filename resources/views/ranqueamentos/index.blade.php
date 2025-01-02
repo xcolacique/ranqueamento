@@ -30,7 +30,7 @@
                 </td>
                 <td><a href="/escolhas/{{ $ranqueamento->id }}" class="btn btn-info">Inscrições</a></td>
                 <td><a href="/scores/{{ $ranqueamento->id }}" class="btn btn-info">Classificação</a></td>
-                <td><a href="{{ route('ciclo_basico') }}" class="btn btn-info">Candidatos</a></td>
+                <td><a href="/ranqueamentos/ciclo_basico/{{ $ranqueamento->id }}" class="btn btn-info">Candidatos</a></td>
                 <td>
                     <a href="/ranqueamentos/{{ $ranqueamento->id }}/edit" class="btn btn-warning"><i class="fas fa-pencil-alt"></i></a>
                 </td>

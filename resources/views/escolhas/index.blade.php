@@ -30,13 +30,13 @@
           <td>{{ number_format($group['media'], 2, ',') }}</td>
           <td>{{ $group['classificacao'] }}</td>
           <td>{{ $group['prioridade_classificacao'] }}</td>
-          <td>{!! $group['nomhab1'] !!}</td>
-          <td>{!! $group['nomhab2'] !!}</td>
-          <td>{!! $group['nomhab3'] !!}</td>
-          <td>{!! $group['nomhab4'] !!}</td>
-          <td>{!! $group['nomhab5'] !!}</td>
-          <td>{!! $group['nomhab6'] !!}</td>
-          <td>{!! $group['nomhab7'] !!}</td>
+          <td>{{ $group['nomhab1'] }}</td>
+          <td>{{ $group['nomhab2'] }}</td>
+          <td>{{ $group['nomhab3'] }}</td>
+          <td>{{ $group['nomhab4'] }}</td>
+          <td>{{ $group['nomhab5'] }}</td>
+          <td>{{ $group['nomhab6'] }}</td>
+          <td>{{ $group['nomhab7'] }}</td>
         </tr>
     @endforeach
 
