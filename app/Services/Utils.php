@@ -81,6 +81,25 @@ class Utils
         return (bool)$record['computed'];
     }
 
+    public static function reranqueamento_check(int $codpes, int $ano){
+        $anosem = "{$ano}2";
+
+        $query = "SELECT COUNT(*)
+        FROM VINCULOPESSOAUSP V
+        INNER JOIN SITALUNOATIVOGR S ON (V.codpes = S.codpes) AND (V.codclg = S.codclg)
+        WHERE V.tipvin = 'ALUNOGR'
+            AND (V.codclg = 8)
+            AND ((V.codhab=102 OR V.codhab=104) AND (S.codhab=102 OR S.codhab=104))
+            AND (V.codcurgrd = 8051)
+            AND YEAR(dtainivin) = {$ano}
+            AND S.anosem = {$anosem}
+            AND (S.staalu = 'M' OR S.staalu = 'A' OR S.staalu = 'R')
+            AND V.codpes = $codpes
+        ";
+        $record = DB::fetch($query);
+        return (bool)$record['computed'];
+    }
+
     public static function lista_habs(){
         $query = "SELECT H.codhab, H.nomhab, H.perhab
             FROM CURSOGR C, HABILITACAOGR H
@@ -219,6 +238,10 @@ class Utils
         });
 
         return ((($primeiro->sum('nota') / 4) + ($segundo->sum('nota') / 2)) / 3);
+    }
+
+    public static function declinou(){
+        return 'sim';
     }
 
 }

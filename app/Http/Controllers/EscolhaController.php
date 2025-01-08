@@ -37,7 +37,7 @@ class EscolhaController extends Controller
     }
 
     public function form(){
-        Gate::authorize('ciclo_basico');
+        Gate::authorize('elegivel');
         $ranqueamento = Ranqueamento::where('status',1)->first();
         $escolhas = Escolha::where('ranqueamento_id',$ranqueamento->id)
                             ->where('user_id', auth()->user()->id)
@@ -57,7 +57,7 @@ class EscolhaController extends Controller
     }
 
     public function store(Request $request){
-        Gate::authorize('ciclo_basico');
+        Gate::authorize('elegivel');
         $ranqueamento = Ranqueamento::where('status',1)->first();
 
         $request->validate([
@@ -98,7 +98,7 @@ class EscolhaController extends Controller
     }
 
     public function declinar(Request $request){
-        Gate::authorize('ciclo_basico');
+        Gate::authorize('elegivel');
         $ranqueamento = Ranqueamento::where('status',1)->first();
 
         if(!$ranqueamento) {

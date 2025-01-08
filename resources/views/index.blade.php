@@ -1,7 +1,7 @@
 @extends('laravel-usp-theme::master')
 
 @section('content')
-  @can('ciclo_basico')
+  @can('elegivel')
     <div class="card">
       <div class="card-header">
         Meu ranqueamento
@@ -10,11 +10,22 @@
         <h5 class="card-title"></h5>
         <p class="card-text">
           @include('escolhas.partials.info')
-          @include('escolhas.partials.declinio')
+
+          @if($ranqueamento && $ranqueamento->tipo=='ingressantes')
+            @include('escolhas.partials.declinio')
+            <br>
+            <a href="{{route('escolhas_form')}}" class="btn btn-primary">Editar opções de habilitações para ranqueamento</a>
+            <br><br>
+            @include('escolhas.partials.show')
+          @endif
+
+          @if($ranqueamento && $ranqueamento->tipo=='reranqueamento')
+            Raphael vai fazer
+          @endif
+
           <br>
-          <a href="{{route('escolhas_form')}}" class="btn btn-primary">Editar opções de habilitações para ranqueamento</a>
-          <br><br>
-          @include('escolhas.partials.show')
+          Letícia
+
         </p>
         <br>
       </div>
@@ -34,5 +45,5 @@
         </div>
       </div>
     @endauth
-  @endcan('ciclo_basico')
+  @endcan('elegivel')
 @endsection

@@ -1,4 +1,4 @@
-@if(\App\Service\Utils::declinou())
+@if(\App\Services\Utils::declinou())
     <form class="form-inline" method="POST" action="{{ route('declinar') }}">
         @csrf
         <b>Declinou do português?</b>&nbsp;sim&nbsp;
