@@ -21,4 +21,15 @@ class NotaController extends Controller
             'media' => $media,
         ]);
     }
+
+    public function hist($codpes) {
+        Gate::authorize('admin');
+
+        $disciplinas = Utils::disciplinas_aprovadas_ou_dispensadas($codpes);
+
+        $notas = [];
+        if($disciplinas) {
+            $notas = Utils::getNotas($codpes, array_column($disciplinas, 'coddis'));
+        }
+    }
 }

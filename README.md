@@ -1,8 +1,9 @@
 ## ranqueamento
 
-sistema para ranqueamento das habilitações do curso de letras
+Sistema para ranqueamento das habilitações do curso de letras
 
+Falta verificar para reranqueamento:
 
-101416 	
-5677071 	
-6067642 	
+- Alunos com trancamento total podem ou não participarem
+- pegar exemplo de alunos com mais de 8 créditos que não poderiam participar
+

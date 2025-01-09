@@ -185,6 +185,8 @@ class Utils
     }
 
     public static function getNotas(int $codpes, array $disciplinas) {
+        if(empty($disciplinas)) return [];
+
         $disciplinas = collect($disciplinas)->map(function($disciplina) {
                 return "'" . $disciplina . "'";
             })->implode(',', $disciplinas);
@@ -236,7 +238,6 @@ class Utils
         $interno = $rqmInternos->isEmpty() ? collect([]) : DispensaUSP::handle($codpes, $rqmInternos);
 
         return $externo->merge($interno);
-
     }
 
     public static function getMedia($notas) {
@@ -249,8 +250,29 @@ class Utils
         return ((($primeiro->sum('nota') / 4) + ($segundo->sum('nota') / 2)) / 3);
     }
 
-    public static function declinou(){
-        return 'sim';
+    public static function declinou($user_id = null, $ranqueamento = null){
+        if(is_null($user_id)) $user_id = auth()->user()->id;
+        if(is_null($ranqueamento))  $ranqueamento = Ranqueamento::where('status',1)->first();
+       
+        $declinio = Declinio::where('ranqueamento_id',$ranqueamento->id)
+                            ->where('user_id',$user_id)->first();
+
+        if($declinio) return true;
+        return false;
     }
 
+    public static function disciplinas_aprovadas_ou_dispensadas($codpes){
+        $query = "SELECT D.coddis, D.nomdis, D.creaul, D.cretrb
+                    FROM HISTESCOLARGR H
+                    INNER JOIN DISCIPLINAGR D ON H.coddis = D.coddis AND H.verdis = D.verdis
+                    WHERE H.codpes = {$codpes}
+                        AND (H.rstfim='A' OR H.rstfim='D')
+                        AND codpgm = (
+                                    SELECT codpgm
+                                    FROM PROGRAMAGR
+                                    WHERE codpes = {$codpes} AND stapgm = 'A'
+                                )";
+        return DB::fetchAll($query);
+
+    }
 }
