@@ -82,10 +82,18 @@ class Utils
     }
 
     public static function reranqueamento_check(int $codpes){
-        // pode participar do reranqueamento os alunos:
+        // primeiro verificamos se é aluno(a) de letras
+        $query = "SELECT V.codpes FROM VINCULOPESSOAUSP V
+                    WHERE V.tipvin = 'ALUNOGR'
+                        AND (V.codpes= {$codpes})
+                        AND (V.codclg = 8)
+                        AND (V.codcurgrd = 8051)";
+        $record = DB::fetch($query);
+        if(!$record) return false;
+
+        // podem participar do reranqueamento os alunos:
         // 1. Cursaram no máximo oito semestres retroativos
         // 2. Não estão com o curso trancado 
-
         $query = "SELECT * FROM SITALUNOATIVOGR 
                     WHERE codpes = {$codpes}
                     AND staalu='M'
