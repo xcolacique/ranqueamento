@@ -185,7 +185,7 @@ class Utils
     }
 
     public static function getNotas(int $codpes, array $disciplinas) {
-        if(empty($disciplinas)) return [];
+        if(empty($disciplinas)) return colletc([]);
 
         $disciplinas = collect($disciplinas)->map(function($disciplina) {
                 return "'" . $disciplina . "'";
@@ -262,7 +262,7 @@ class Utils
     }
 
     public static function disciplinas_aprovadas_ou_dispensadas($codpes){
-        $query = "SELECT D.coddis, D.nomdis, D.creaul, D.cretrb
+        $query = "SELECT D.coddis, D.nomdis, D.creaul, D.cretrb, H.rstfim
                     FROM HISTESCOLARGR H
                     INNER JOIN DISCIPLINAGR D ON H.coddis = D.coddis AND H.verdis = D.verdis
                     WHERE H.codpes = {$codpes}
@@ -273,6 +273,45 @@ class Utils
                                     WHERE codpes = {$codpes} AND stapgm = 'A'
                                 )";
         return DB::fetchAll($query);
+    }
 
+    // combina os arrays disciplinas e notas para ficar mais fácil de usar
+    // melhorar essas abordagem
+    public static function combina_disciplinas_notas($disciplinas, $notas){
+        $novo_array = [];
+
+        $novo_array = $notas->map(function($nota) use ($disciplinas){
+
+            $disciplina = array_filter($disciplinas, function($disciplina) use ($nota){
+                if($disciplina['coddis'] == $nota['coddis']){
+                    return $disciplina;
+                }
+            });
+
+            $disciplina = array_pop($disciplina);
+
+            return [
+                'coddis' => $nota['coddis'],
+                'nota'   => $nota['nota'],
+                'nomdis' => $disciplina['nomdis'],
+                'creaul' => $disciplina['creaul'],
+                'cretrb' => $disciplina['cretrb'],
+                'rstfim' => $disciplina['rstfim'],
+            ];
+        });
+
+        return $novo_array;
+    }
+
+    public static function obterMediaPonderada($disciplinas)
+    {
+        $creditos = 0;
+        $soma = 0;
+        foreach ($disciplinas as $disciplina) {
+            $creditos += $disciplina['creaul'] + $disciplina['cretrb'];
+            $nota = $disciplina['nota'];
+            $soma += $nota * ($disciplina['creaul'] + $disciplina['cretrb']);
+        }
+        return empty($soma) ? 0 : round($soma / $creditos, 1);
     }
 }

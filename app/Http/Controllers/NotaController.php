@@ -31,5 +31,9 @@ class NotaController extends Controller
         if($disciplinas) {
             $notas = Utils::getNotas($codpes, array_column($disciplinas, 'coddis'));
         }
+
+        $disciplinas = Utils::combina_disciplinas_notas($disciplinas, $notas);
+        $media_ponderada = Utils::obterMediaPonderada($disciplinas);
+        dd($media_ponderada);
     }
 }
