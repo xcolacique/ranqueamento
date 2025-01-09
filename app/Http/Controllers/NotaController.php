@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Gate;
 use App\Services\Utils;
 use App\Models\Escolha;
 use App\Models\User;
+use Uspdev\Replicado\Pessoa;
 
 class NotaController extends Controller
 {
@@ -34,6 +35,12 @@ class NotaController extends Controller
 
         $disciplinas = Utils::combina_disciplinas_notas($disciplinas, $notas);
         $media_ponderada = Utils::obterMediaPonderada($disciplinas);
-        dd($media_ponderada);
+
+        return view('notas.hist', [
+            'codpes' => $codpes,
+            'nome' => Pessoa::retornarNome($codpes),
+            'disciplinas' => $disciplinas,
+            'media_ponderada' => $media_ponderada,
+        ]);
     }
 }
