@@ -33,7 +33,9 @@ class AppServiceProvider extends ServiceProvider
                     | in_array($user->codpes,explode(',',$ranqueamento->permitidos));
             }
             if($ranqueamento && $ranqueamento->tipo=='reranqueamento') {
-                return true;
+                return
+                    Utils::reranqueamento_check($user->codpes)
+                    | in_array($user->codpes,explode(',',$ranqueamento->permitidos));
             }
 
             return false;

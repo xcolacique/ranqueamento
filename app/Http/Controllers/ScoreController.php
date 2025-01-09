@@ -69,14 +69,14 @@ class ScoreController extends Controller
                                             ->pluck('user_id')
                                             ->toArray();
 
-                // Escolhas para o cadidato em questão, caso ele ainda não tenha sido alocado
+                // Escolhas para o candidato em questão, caso ele ainda não tenha sido alocado
                 $escolha = Escolha::where('ranqueamento_id',$ranqueamento->id)
                                     ->where('user_id', $score->user_id)
                                     ->where('prioridade', $prioridade)
                                     ->whereNotIn('user_id',$candidatos_alocados)
                                     ->first();
 
-                // Se o candidado escolheu uma habilitação nessa prioridade e ainda não tem habilitação
+                // Se o candidato escolheu uma habilitação nessa prioridade e ainda não tem habilitação
                 // E se ainda tem vaga nessa habilitação
                 if($escolha && $vagas[$escolha->hab->id]>0) {
                     $score->hab_id_eleita = $escolha->hab->id;

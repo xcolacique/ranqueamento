@@ -81,23 +81,25 @@ class Utils
         return (bool)$record['computed'];
     }
 
-    public static function reranqueamento_check(int $codpes, int $ano){
-        $anosem = "{$ano}2";
+    public static function reranqueamento_check(int $codpes){
+        // pode participar do reranqueamento os alunos:
+        // 1. Cursaram no máximo oito semestres retroativos
+        // 2. Não estão com o curso trancado 
 
-        $query = "SELECT COUNT(*)
-        FROM VINCULOPESSOAUSP V
-        INNER JOIN SITALUNOATIVOGR S ON (V.codpes = S.codpes) AND (V.codclg = S.codclg)
-        WHERE V.tipvin = 'ALUNOGR'
-            AND (V.codclg = 8)
-            AND ((V.codhab=102 OR V.codhab=104) AND (S.codhab=102 OR S.codhab=104))
-            AND (V.codcurgrd = 8051)
-            AND YEAR(dtainivin) = {$ano}
-            AND S.anosem = {$anosem}
-            AND (S.staalu = 'M' OR S.staalu = 'A' OR S.staalu = 'R')
-            AND V.codpes = $codpes
-        ";
-        $record = DB::fetch($query);
-        return (bool)$record['computed'];
+        $query = "SELECT * FROM SITALUNOATIVOGR 
+                    WHERE codpes = {$codpes}
+                    AND staalu='M'
+                    AND codclg=8
+                    AND codcur=8051
+                    AND codpgm = (
+                                    SELECT codpgm
+                                    FROM PROGRAMAGR
+                                    WHERE codpes = {$codpes} -- Permitir trancados? AND stapgm = 'A'
+                                )
+                   ";
+        $records = DB::fetchAll($query);
+        if(count($records)<=8) return true;
+        return false;
     }
 
     public static function lista_habs(){
@@ -117,18 +119,17 @@ class Utils
     public static function periodo($codpes = null){
         if(is_null($codpes)) $codpes = auth()->user()->codpes;
 
-        $query = "SELECT V.codhab
-        FROM VINCULOPESSOAUSP V
-        WHERE V.tipvin = 'ALUNOGR'
-            AND (V.codclg = 8)
-            AND (V.codhab=102 OR V.codhab=104)
-            AND (V.codcurgrd = 8051)
-            AND V.codpes = $codpes
-        ";
+        $query = "SELECT H.perhab FROM VINCULOPESSOAUSP V
+                    INNER JOIN HABILITACAOGR H ON V.codhab=H.codhab
+                    WHERE V.tipvin = 'ALUNOGR'
+                        AND (V.codclg = 8)
+                        AND (V.codcurgrd = 8051 AND H.codcur = 8051)
+                        AND V.codpes = {$codpes}
+                        AND ((H.dtaatvhab IS NOT NULL) AND (H.dtadtvhab IS NULL))";
+
         $record = DB::fetch($query);
-        if(!$record) return '';
-        if($record['codhab'] == 102) return 'matutino';
-        if($record['codhab'] == 104) return 'noturno';
+        if($record) return $record['perhab'];
+        return '';
     }
 
     public static function get_hab($codhab){
