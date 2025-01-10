@@ -9,9 +9,7 @@
       <th scope="col">Número USP</th>
       <th>Notas Ranqueamento</th>
       <th>Notas Re-ranqueamento</th>
-      @if($ranqueamento->tipo =='ingressantes')
-        <th scope="col">Declinou do português?</th>
-      @endif
+      <th scope="col">Declinou do português?</th>
       <th scope="col">Média</th>
       <th scope="col">Classificação</th>
       <th scope="col">Opção eleita</th>
@@ -31,9 +29,7 @@
           <td>{{ $group['codpes'] }}</td>
           <td><a href="notas/{{ $group['codpes'] }}">Notas 1</a></td>
           <td><a href="hist/{{ $group['codpes'] }}">Notas 2</a></td>
-          @if($ranqueamento->tipo =='ingressantes')
-            <td>{{ $group['declinou'] }}</td>
-          @endif
+          <td>{{ $group['declinou'] }}</td>
           <td>{{ number_format($group['media'], 2, ',') }}</td>
           <td>{{ $group['classificacao'] }}</td>
           <td>{{ $group['prioridade_classificacao'] }}</td>

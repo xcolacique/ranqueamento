@@ -29,13 +29,13 @@ class ScoreController extends Controller
 
         // salvando só os estudantes que vão participar desse ranqueamento
         foreach($candidatos as $candidato) {
-            // nota para ranqueamento de ingressantes
+            // notas para ranqueamento de ingressantes
             if($ranqueamento->tipo == 'ingressantes'){
                 $disciplinas = array_merge(Escolha::disciplinas(),Escolha::disciplinas_segundo());
                 $notas = Utils::getNotas($candidato->user->codpes, $disciplinas);
                 $media = Utils::getMedia($notas);
             } else {
-                // caso do re-ranqueamento
+                // notas para re-ranqueamento
                 $disciplinas = Utils::disciplinas_aprovadas_ou_dispensadas($candidato->user->codpes);
 
                 $notas = [];
@@ -63,6 +63,8 @@ class ScoreController extends Controller
             // vamos zerar 
             $score->hab_id_eleita = null;
             $score->prioridade_eleita = null;
+            $score->codhab_jupiterweb = null;
+            $score->posicao = null;
             $score->save();
         }
 
@@ -75,13 +77,19 @@ class ScoreController extends Controller
         }
 
         // para cada candidato, da maior média para a menor, vamos alocando nas habilitações
-        foreach(Score::orderBy('nota','DESC')->get() as $score){
+        $scores = Score::where('ranqueamento_id',$ranqueamento->id)
+                        ->orderBy('nota','DESC')
+                        ->get();
+        foreach($scores as $score){
+            
             // vamos varrer cada prioridade e verificar se o aluno tem nota suficiente para entrar em alguma habilitação
+            
             for($prioridade = 1; $prioridade <= $ranqueamento->max; $prioridade++) {
 
                 // Candidatos que já foram alocados em alguma habilitação e vamos ignorar
                 $candidatos_alocados = Score::whereNotNull('hab_id_eleita')
                                             ->whereNotNull('prioridade_eleita')
+                                            ->where('ranqueamento_id',$ranqueamento->id)
                                             ->pluck('user_id')
                                             ->toArray();
 
@@ -89,6 +97,7 @@ class ScoreController extends Controller
                 $escolha = Escolha::where('ranqueamento_id',$ranqueamento->id)
                                     ->where('user_id', $score->user_id)
                                     ->where('prioridade', $prioridade)
+                                    ->where('ranqueamento_id',$ranqueamento->id)
                                     ->whereNotIn('user_id',$candidatos_alocados)
                                     ->first();
 
@@ -105,30 +114,32 @@ class ScoreController extends Controller
             }
         }
 
-        $scores = Score::where('ranqueamento_id',$ranqueamento->id)
-                        ->orderBy('nota','DESC')
-                        ->get();
-        
         // Acertando as declinações do português
         foreach($scores as $score){
-            $periodo = Utils::periodo($score->user->codpes);
+            
+            $declinio = Declinio::where('user_id',$score->user_id)
+                ->where('ranqueamento_id', $ranqueamento->id)
+                ->first();
 
-            // aqueles que não foram alocados em disciplina alguma, ficarão somente com o português
-            if(is_null($score->hab_id_eleita)){
-                if($periodo == 'matutino') $score->codhab_jupiterweb = 202;
-                else $score->codhab_jupiterweb = 204;
-            } else {
-                $declinio = Declinio::where('user_id',$score->user_id)
-                                    ->where('ranqueamento_id', $ranqueamento->id)
-                                    ->first();
-                // se o aluno declinou do português e foi selecionado no ranqueamento
-                if($declinio) {
+            if(!is_null($score->hab_id_eleita)){
+                if($declinio){
+                    // caso em que houve declínio do português
                     $score->codhab_jupiterweb = $score->hab->codhab;
                 } else {
-                    // se o aluno não declinou do português e foi selecionado no ranqueamento
+                    // caso em que não houve declínio do português
                     $score->codhab_jupiterweb = Hab::mapeamento()[$score->hab->codhab];
                 }
             }
+
+
+            // No caso de ranqueamento de ingressantes, aqueles que não foram
+            // alocados em disciplina alguma, ficarão somente com o português
+            if($ranqueamento->tipo=='ingressantes' && is_null($score->hab_id_eleita)){
+                $periodo = Utils::periodo($score->user->codpes);
+                if($periodo == 'matutino') $score->codhab_jupiterweb = 202;
+                else $score->codhab_jupiterweb = 204;
+            }
+
             $score->save();
         }
         
@@ -153,7 +164,9 @@ class ScoreController extends Controller
 
     public function csv(Excel $excel, Ranqueamento $ranqueamento){
 
-        $data = Score::where('ranqueamento_id',$ranqueamento->id)->get();
+        $data = Score::where('ranqueamento_id',$ranqueamento->id)
+                       ->whereNotNull('codhab_jupiterweb')
+                       ->get();
 
         // colunas fixas
         foreach($data as $item){

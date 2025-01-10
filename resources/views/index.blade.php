@@ -11,20 +11,11 @@
         <p class="card-text">
           @include('escolhas.partials.info')
           <br>
-          @if($ranqueamento && $ranqueamento->tipo=='ingressantes')
-            @include('escolhas.partials.declinio')
-            <br>
-            <a href="{{route('escolhas_form')}}" class="btn btn-primary">Escolher opções de habilitações para ranqueamento</a>
+          @include('escolhas.partials.declinio')
+          <br>
+            <a href="{{route('escolhas_form')}}" class="btn btn-primary">Escolher habilitação(ões) para ranqueamento</a>
             <br><br>
             @include('escolhas.partials.show')
-          @endif
-
-          @if($ranqueamento && $ranqueamento->tipo=='reranqueamento')
-            <a href="{{route('escolhas_form')}}" class="btn btn-primary">Escolher opção de habilitação para re-ranqueamento</a>
-            <br><br>
-            @include('escolhas.partials.show')
-          @endif
-
         </p>
         <br>
       </div>

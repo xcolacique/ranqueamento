@@ -41,12 +41,10 @@ class HabilitacaoService
                     'media' => 0,
                     'classificacao' => '',
                     'prioridade_classificacao' => '',
-                    'posicao' => ''
+                    'posicao' => '',
+                    'declinou' => $declinios->contains($aluno->id) ? 'sim' : 'não',
                 ];
 
-                if($ranqueamento && $ranqueamento->tipo=='ingressantes'){
-                    $aluno['declinou'] = $declinios->contains($aluno['id']) ? 'sim' : 'não';
-                }
 
                 if($score) {
                     $aluno['media'] = $score->nota;
@@ -75,11 +73,7 @@ class HabilitacaoService
 
     public static function headings(Ranqueamento $ranqueamento) {
 
-        $heading = ['id','Número USP','Nome','Média','Classificação','Prioridade Eleita','Posição'];
-
-        if($ranqueamento && $ranqueamento->tipo=='ingressantes'){
-            $heading[] = 'Declinou do Português?';
-        }
+        $heading = ['id','Número USP','Nome','Média','Classificação','Prioridade Eleita','Posição','Declinou do Português?'];
 
         for ($prioridade = 1; $prioridade <= $ranqueamento->max; $prioridade++) {
             $heading[] = 'Opção ' . $prioridade; 
