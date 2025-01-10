@@ -40,7 +40,7 @@ class ScoreController extends Controller
 
                 $notas = [];
                 if($disciplinas) {
-                    $notas = Utils::getNotas($candidato->user->codpes, array_column($disciplinas, 'coddis'));
+                    $notas = Utils::getNotas($candidato->user->codpes, array_column($disciplinas, 'coddis'), true);
                 }
         
                 $disciplinas = Utils::combina_disciplinas_notas($disciplinas, $notas);

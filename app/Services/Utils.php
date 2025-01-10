@@ -184,7 +184,7 @@ class Utils
         return null;
     }
 
-    public static function getNotas(int $codpes, array $disciplinas) {
+    public static function getNotas(int $codpes, array $disciplinas, $reranqueamento=false) {
         if(empty($disciplinas)) return colletc([]);
 
         $disciplinas = collect($disciplinas)->map(function($disciplina) {
@@ -198,6 +198,11 @@ class Utils
                 FROM PROGRAMAGR
                 WHERE codpes = $codpes AND stapgm = 'A'
             ) AND codpes = $codpes AND stamtr = 'M' AND coddis IN($disciplinas)";
+
+        if($reranqueamento) {
+            $query .= " AND (rstfim='A' OR rstfim='D')";
+        }
+
         $resultados = DB::fetchAll($query);
 
         [$disciplinas, $aproveitamentos] = collect($resultados)->partition(function($disciplina) {
