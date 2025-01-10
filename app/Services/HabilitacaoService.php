@@ -25,7 +25,7 @@ class HabilitacaoService
         $alunos = User::wherehas('escolhas', function (Builder $query) use ($ranqueamento) {
                 $query->where('ranqueamento_id', $ranqueamento->id);
             })
-            ->select(['id','codpes','name'])
+            ->select(['id','codpes','name','email'])
             ->orderBy('name')
             ->get()
             ->map(function($aluno) use($declinios, $escolhas, $ranqueamento) {
@@ -33,11 +33,11 @@ class HabilitacaoService
                 $score = Score::where('codpes',$aluno->codpes)
                                 ->where('ranqueamento_id',$ranqueamento->id)
                                 ->first();
-    
                 $aluno = [
                     'id' => $aluno->id,
                     'codpes' => $aluno->codpes,
-                    'name' => $aluno->name,
+                    'name' => $aluno->email,
+                    'email' => $aluno->email,
                     'media' => 0,
                     'classificacao' => '',
                     'prioridade_classificacao' => '',
@@ -73,7 +73,7 @@ class HabilitacaoService
 
     public static function headings(Ranqueamento $ranqueamento) {
 
-        $heading = ['id','Número USP','Nome','Média','Classificação','Prioridade Eleita','Posição','Declinou do Português?'];
+        $heading = ['id','Número USP','Nome','E-mail','Média','Classificação','Prioridade Eleita','Posição','Declinou do Português?'];
 
         for ($prioridade = 1; $prioridade <= $ranqueamento->max; $prioridade++) {
             $heading[] = 'Opção ' . $prioridade; 

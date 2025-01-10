@@ -6,6 +6,7 @@
   <thead>
     <tr>
       <th scope="col">Nome</th>
+      <th scope="col">E-mail</th>
       <th scope="col">Número USP</th>
       <th>Notas Ranqueamento</th>
       <th>Notas Re-ranqueamento</th>
@@ -26,6 +27,7 @@
     @foreach($grouped as $group)
         <tr>
           <td>{{ $group['name'] }}</td>
+          <td>{{ $group['email'] }}</td>
           <td>{{ $group['codpes'] }}</td>
           <td><a href="notas/{{ $group['codpes'] }}">Notas 1</a></td>
           <td><a href="hist/{{ $group['codpes'] }}">Notas 2</a></td>
