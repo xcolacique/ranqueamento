@@ -84,9 +84,7 @@ class Utils
     public static function reranqueamento_check(int $codpes){
         // primeiro verificamos se é aluno(a) de letras
         $query = "SELECT V.codpes FROM VINCULOPESSOAUSP V
-                    INNER JOIN PROGRAMAGR P ON P.codpes=V.codpes
                     WHERE V.tipvin = 'ALUNOGR'
-                        AND P.stapgm= 'A'
                         AND V.codpes= {$codpes}
                         AND V.codclg = 8
                         AND V.codcurgrd = 8051";
@@ -104,7 +102,7 @@ class Utils
                     AND codpgm = (
                                     SELECT codpgm
                                     FROM PROGRAMAGR
-                                    WHERE codpes = {$codpes} -- Permitir trancados? AND stapgm = 'A'
+                                    WHERE codpes = {$codpes} AND stapgm = 'A'
                                 )
                    ";
         $records = DB::fetchAll($query);
