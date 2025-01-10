@@ -231,7 +231,7 @@ class Utils
         $requerimento = "SELECT R2.coddis, R.tiprqm, R.codrqm FROM REQUERIMENTOGR R
                          INNER JOIN REQUERHISTESC R2 ON (R.codrqm = R2.codrqm)
                          WHERE R.codpes = $codpes AND R.codpgm = $codpgm AND R.rstfim = 'D'
-                         AND R.starqm = 'C' AND R.tiprqm IN ('Dispensa Externa','Dispensa USP')";
+                         AND R.starqm = 'C' AND R.tiprqm IN ('Dispensa Externa','Dispensa USP','AEL extra-grade USP ')";
 
         $requerimentos = DB::fetchAll($requerimento);
 
