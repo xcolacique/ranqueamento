@@ -280,6 +280,8 @@ class Utils
     public static function combina_disciplinas_notas($disciplinas, $notas){
         $novo_array = [];
 
+        if(empty($disciplinas)) return $novo_array;
+
         $novo_array = $notas->map(function($nota) use ($disciplinas){
 
             $disciplina = array_filter($disciplinas, function($disciplina) use ($nota){
