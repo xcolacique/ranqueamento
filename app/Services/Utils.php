@@ -106,7 +106,7 @@ class Utils
                                 )
                    ";
         $records = DB::fetchAll($query);
-        if(count($records)<=8) return true;
+        if(count($records)<=9) return true;
         return false;
     }
 
