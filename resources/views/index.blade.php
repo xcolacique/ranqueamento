@@ -10,21 +10,20 @@
         <h5 class="card-title"></h5>
         <p class="card-text">
           @include('escolhas.partials.info')
-
+          <br>
           @if($ranqueamento && $ranqueamento->tipo=='ingressantes')
             @include('escolhas.partials.declinio')
             <br>
-            <a href="{{route('escolhas_form')}}" class="btn btn-primary">Editar opções de habilitações para ranqueamento</a>
+            <a href="{{route('escolhas_form')}}" class="btn btn-primary">Escolher opções de habilitações para ranqueamento</a>
             <br><br>
             @include('escolhas.partials.show')
           @endif
 
           @if($ranqueamento && $ranqueamento->tipo=='reranqueamento')
-            Raphael vai fazer
+            <a href="{{route('escolhas_form')}}" class="btn btn-primary">Escolher opção de habilitação para re-ranqueamento</a>
+            <br><br>
+            @include('escolhas.partials.show')
           @endif
-
-          <br>
-          Letícia
 
         </p>
         <br>

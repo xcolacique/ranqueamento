@@ -29,8 +29,24 @@ class ScoreController extends Controller
 
         // salvando só os estudantes que vão participar desse ranqueamento
         foreach($candidatos as $candidato) {
-            $notas = Utils::getNotas($candidato->user->codpes, array_merge(Escolha::disciplinas(),Escolha::disciplinas_segundo()));
-            $media = Utils::getMedia($notas);
+            // nota para ranqueamento de ingressantes
+            if($ranqueamento->tipo == 'ingressantes'){
+                $disciplinas = array_merge(Escolha::disciplinas(),Escolha::disciplinas_segundo());
+                $notas = Utils::getNotas($candidato->user->codpes, $disciplinas);
+                $media = Utils::getMedia($notas);
+            } else {
+                // caso do re-ranqueamento
+                $disciplinas = Utils::disciplinas_aprovadas_ou_dispensadas($candidato->user->codpes);
+
+                $notas = [];
+                if($disciplinas) {
+                    $notas = Utils::getNotas($candidato->user->codpes, array_column($disciplinas, 'coddis'));
+                }
+        
+                $disciplinas = Utils::combina_disciplinas_notas($disciplinas, $notas);
+                $media = Utils::obterMediaPonderada($disciplinas);
+            }
+
 
             $score = Score::where('user_id', $candidato->user_id)
                             ->where('ranqueamento_id',$ranqueamento->id)
@@ -61,7 +77,7 @@ class ScoreController extends Controller
         // para cada candidato, da maior média para a menor, vamos alocando nas habilitações
         foreach(Score::orderBy('nota','DESC')->get() as $score){
             // vamos varrer cada prioridade e verificar se o aluno tem nota suficiente para entrar em alguma habilitação
-            for($prioridade = 1; $prioridade <= 7; $prioridade++) {
+            for($prioridade = 1; $prioridade <= $ranqueamento->max; $prioridade++) {
 
                 // Candidatos que já foram alocados em alguma habilitação e vamos ignorar
                 $candidatos_alocados = Score::whereNotNull('hab_id_eleita')
@@ -142,7 +158,7 @@ class ScoreController extends Controller
         // colunas fixas
         foreach($data as $item){
             $item['codcur'] = 8051;
-            $item['dtaini'] = "2025-01-01 00:00:00.000";
+            $item['dtaini'] = date("Y-m-d") . " 00:00:00.000";
         }
 
         $data = $data->map

@@ -7,14 +7,17 @@
     <tr>
       <th scope="col">Nome</th>
       <th scope="col">Número USP</th>
-      <th scope="col">Declinou do português?</th>
+      <th>Notas Ranqueamento</th>
+      <th>Notas Re-ranqueamento</th>
+      @if($ranqueamento->tipo =='ingressantes')
+        <th scope="col">Declinou do português?</th>
+      @endif
       <th scope="col">Média</th>
       <th scope="col">Classificação</th>
       <th scope="col">Opção eleita</th>
-      @for($prioridade = 1; $prioridade <=7; $prioridade++)
-        <th>
-            Opção {{ $prioridade }}
-        </th>
+      <th scope="col">Posição</th>
+      @for($prioridade = 1; $prioridade <= $ranqueamento->max; $prioridade++)
+        <th> Opção {{ $prioridade }}</th>
       @endfor
     </tr>
   </thead>
@@ -24,19 +27,23 @@
   @endcan
     @foreach($grouped as $group)
         <tr>
-          <td><a href="notas/{{ $group['codpes'] }}">{{ $group['name'] }}</a></td>
+          <td>{{ $group['name'] }}</td>
           <td>{{ $group['codpes'] }}</td>
-          <td>{{ $group['declinou'] }}</td>
+          <td><a href="notas/{{ $group['codpes'] }}">Notas 1</a></td>
+          <td><a href="hist/{{ $group['codpes'] }}">Notas 2</a></td>
+          @if($ranqueamento->tipo =='ingressantes')
+            <td>{{ $group['declinou'] }}</td>
+          @endif
           <td>{{ number_format($group['media'], 2, ',') }}</td>
           <td>{{ $group['classificacao'] }}</td>
           <td>{{ $group['prioridade_classificacao'] }}</td>
-          <td>{{ $group['nomhab1'] }}</td>
-          <td>{{ $group['nomhab2'] }}</td>
-          <td>{{ $group['nomhab3'] }}</td>
-          <td>{{ $group['nomhab4'] }}</td>
-          <td>{{ $group['nomhab5'] }}</td>
-          <td>{{ $group['nomhab6'] }}</td>
-          <td>{{ $group['nomhab7'] }}</td>
+          <td>{{ $group['posicao'] }}</td>
+
+          @for($prioridade = 1; $prioridade <= $ranqueamento->max; $prioridade++)
+            @php $key = 'nomhab' . $prioridade ; @endphp
+            <td>{{ $group[$key] }}</td>
+          @endfor
+          
         </tr>
     @endforeach
 

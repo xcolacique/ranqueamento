@@ -6,52 +6,58 @@ use App\Models\Declinio;
 use App\Models\Escolha;
 use App\Models\User;
 use App\Models\Score;
+use App\Models\Ranqueamento;
 use Illuminate\Database\Eloquent\Builder;
 
 class HabilitacaoService
 {
-    public static function options(int $ranqueamento_id)
+    public static function options(Ranqueamento $ranqueamento)
     {
-        $declinios = Declinio::where('ranqueamento_id', $ranqueamento_id)->pluck('user_id');
+        $declinios = Declinio::where('ranqueamento_id', $ranqueamento->id)->pluck('user_id');
 
         $escolhas = Escolha::select(['prioridade','hab_id', 'user_id'])
             ->with(['hab:id,nomhab,perhab'])
-            ->where('ranqueamento_id', $ranqueamento_id)
+            ->where('ranqueamento_id', $ranqueamento->id)
             ->orderBy('user_id')
             ->orderBy('prioridade')
             ->get();
 
-        $alunos = User::wherehas('escolhas', function (Builder $query) use ($ranqueamento_id) {
-                $query->where('ranqueamento_id', $ranqueamento_id);
+        $alunos = User::wherehas('escolhas', function (Builder $query) use ($ranqueamento) {
+                $query->where('ranqueamento_id', $ranqueamento->id);
             })
             ->select(['id','codpes','name'])
             ->orderBy('name')
             ->get()
-            ->map(function($aluno) use($declinios, $escolhas, $ranqueamento_id) {
+            ->map(function($aluno) use($declinios, $escolhas, $ranqueamento) {
 
                 $score = Score::where('codpes',$aluno->codpes)
-                                ->where('ranqueamento_id',$ranqueamento_id)
+                                ->where('ranqueamento_id',$ranqueamento->id)
                                 ->first();
     
                 $aluno = [
                     'id' => $aluno->id,
                     'codpes' => $aluno->codpes,
                     'name' => $aluno->name,
-                    'declinou' => $declinios->contains($aluno->id) ? 'sim' : 'não',
                     'media' => 0,
                     'classificacao' => '',
-                    'prioridade_classificacao' => ''
+                    'prioridade_classificacao' => '',
+                    'posicao' => ''
                 ];
+
+                if($ranqueamento && $ranqueamento->tipo=='ingressantes'){
+                    $aluno['declinou'] = $declinios->contains($aluno['id']) ? 'sim' : 'não';
+                }
 
                 if($score) {
                     $aluno['media'] = $score->nota;
                     $aluno['classificacao'] = $score->hab ? $score->hab->nomhab: $score->hab;
                     $aluno['prioridade_classificacao'] = $score->prioridade_eleita;
+                    $aluno['posicao'] = $score->posicao;
                 }
 
                 $habilitacoes = $escolhas->where('user_id', $aluno['id']);
 
-                for ($prioridade = 1; $prioridade <= 7; $prioridade++) {
+                for ($prioridade = 1; $prioridade <= $ranqueamento->max; $prioridade++) {
                     $habilitacao = $habilitacoes->where('prioridade', $prioridade)->first();
                     if($habilitacao) {
                         $aluno['nomhab' . $prioridade] = $habilitacao->hab->nomhab . ' - ' . $habilitacao->hab->perhab;
@@ -67,22 +73,18 @@ class HabilitacaoService
         return $alunos;
     }
 
-    public static function headings() {
-        return [
-            'id',
-            'Número USP',
-            'Nome',
-            'Declinou do Português?',
-            'Média',
-            'Classificação',
-            'Opção Eleita',
-            'Opção 1',
-            'Opção 2',
-            'Opção 3',
-            'Opção 4',
-            'Opção 5',
-            'Opção 6',
-            'Opção 7'
-        ];
+    public static function headings(Ranqueamento $ranqueamento) {
+
+        $heading = ['id','Número USP','Nome','Média','Classificação','Prioridade Eleita','Posição'];
+
+        if($ranqueamento && $ranqueamento->tipo=='ingressantes'){
+            $heading[] = 'Declinou do Português?';
+        }
+
+        for ($prioridade = 1; $prioridade <= $ranqueamento->max; $prioridade++) {
+            $heading[] = 'Opção ' . $prioridade; 
+        }
+
+        return $heading;
     }
 }

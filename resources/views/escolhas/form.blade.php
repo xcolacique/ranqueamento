@@ -3,6 +3,7 @@
 @section('content')
 
 @include('escolhas.partials.info')
+
 <br>
 <div class="card">
     <div class="card-header">Opções para ranqueamento</div>
@@ -10,7 +11,7 @@
             <form method="post" action="{{ route('escolhas_store') }}">
                 @csrf
 
-                @for($prioridade = 1; $prioridade <=7; $prioridade++)
+                @for($prioridade = 1; $prioridade <= $ranqueamento->max; $prioridade++)
                     @php 
                         // verificando se há habilitação escolhida para cada opção
                         $escolha_salva = $escolhas->where('prioridade', $prioridade)->first();

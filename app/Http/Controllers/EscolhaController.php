@@ -21,8 +21,8 @@ class EscolhaController extends Controller
         Gate::authorize('admin');
 
         return view('escolhas.index',[
-            'grouped' => HabilitacaoService::options($ranqueamento->id),
-            'ranqueamento' => $ranqueamento
+            'grouped' => HabilitacaoService::options($ranqueamento),
+            'ranqueamento' => $ranqueamento,
         ]);
     }
 
@@ -30,8 +30,8 @@ class EscolhaController extends Controller
         Gate::authorize('admin');
 
         $export = new ExcelExport(
-            HabilitacaoService::options($ranqueamento->id)->toArray(),
-            HabilitacaoService::headings()
+            HabilitacaoService::options($ranqueamento)->toArray(),
+            HabilitacaoService::headings($ranqueamento)
         );
         return $excel->download($export, 'ranqueamento' . date('Y') . '.xlsx');
     }
@@ -52,7 +52,8 @@ class EscolhaController extends Controller
 
         return view('escolhas.form',[
             'habs' => $habs,
-            'escolhas' => $escolhas
+            'escolhas' => $escolhas,
+            'ranqueamento' => $ranqueamento
         ]);
     }
 
