@@ -36,7 +36,7 @@ class HabilitacaoService
                 $aluno = [
                     'id' => $aluno->id,
                     'codpes' => $aluno->codpes,
-                    'name' => $aluno->email,
+                    'name' => $aluno->name,
                     'email' => $aluno->email,
                     'media' => 0,
                     'classificacao' => '',
