@@ -28,12 +28,11 @@ class DispensaExterna
         $aproveitamentos = DB::fetchAll($query);
 
         return collect($aproveitamentos)->map(function ($aproveitamento) {
-            if(is_numeric($aproveitamento['nota'])) {
-                return [
+            if(!is_numeric($aproveitamento['nota'])) $aproveitamento['nota'] = 0;
+               return [
                    'coddis' => $aproveitamento['coddis'],
                    'nota'   => $aproveitamento['nota'] / $aproveitamento['qtdedisc']
                 ];  
-            }
         });
 
     }
