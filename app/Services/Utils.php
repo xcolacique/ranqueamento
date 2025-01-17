@@ -82,7 +82,12 @@ class Utils
     }
 
     public static function reranqueamento_check(int $codpes){
-        // primeiro verificamos se é aluno(a) de letras
+        // verificamos se é aluno(a) de graduação ativo
+        $query = "SELECT codpgm FROM PROGRAMAGR WHERE codpes = {$codpes} AND stapgm = 'A'";
+        $record = DB::fetch($query);
+        if(!$record) return false;
+
+        // verificamos se é aluno(a) de letras
         $query = "SELECT V.codpes FROM VINCULOPESSOAUSP V
                     WHERE V.tipvin = 'ALUNOGR'
                         AND V.codpes= {$codpes}
@@ -90,7 +95,7 @@ class Utils
                         AND V.codcurgrd = 8051";
         $record = DB::fetch($query);
         if(!$record) return false;
-
+        
         // podem participar do reranqueamento os alunos:
         // 1. Cursaram no máximo oito semestres retroativos
         // 2. Não estão com o curso trancado 
@@ -196,7 +201,7 @@ class Utils
             WHERE codpgm = (
                 SELECT codpgm
                 FROM PROGRAMAGR
-                WHERE codpes = $codpes AND stapgm = 'A'
+                WHERE codpes = $codpes AND (stapgm = 'A' OR stapgm = 'R')
             ) AND codpes = $codpes AND stamtr = 'M' AND coddis IN($disciplinas)";
 
         if($reranqueamento) {
@@ -266,6 +271,10 @@ class Utils
         return false;
     }
 
+    /**
+     * No Re-ranqueamento, essa função prepara as displicinas que dever ser passadas
+     * para o método getNotas.
+     */
     public static function disciplinas_aprovadas_ou_dispensadas($codpes){
         $query = "SELECT D.coddis, D.nomdis, D.creaul, D.cretrb, H.rstfim
                     FROM HISTESCOLARGR H
@@ -275,7 +284,7 @@ class Utils
                         AND codpgm = (
                                     SELECT codpgm
                                     FROM PROGRAMAGR
-                                    WHERE codpes = {$codpes} AND stapgm = 'A'
+                                    WHERE codpes = {$codpes} AND (stapgm = 'A' OR stapgm = 'R')
                                 )";
         return DB::fetchAll($query);
     }
