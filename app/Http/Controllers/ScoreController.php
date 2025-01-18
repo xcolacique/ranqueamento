@@ -47,12 +47,9 @@ class ScoreController extends Controller
                 $media = Utils::obterMediaPonderada($disciplinas);
             }
 
+            Score::where('ranqueamento_id',$ranqueamento->id)->delete();
 
-            $score = Score::where('user_id', $candidato->user_id)
-                            ->where('ranqueamento_id',$ranqueamento->id)
-                            ->first();
-
-            if(!$score) $score = new Score;
+            $score = new Score;
 
             $score->user_id = $candidato->user_id;
             $score->codpes = $candidato->user->codpes;
