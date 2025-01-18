@@ -81,6 +81,7 @@ class EscolhaController extends Controller
                 ->whereIn('prioridade', $prioridades_deletar)
                 ->delete();
 
+        $flash = 'Escolha(s) para ranqueamento registrada(s) com sucesso!<br><br>';
         foreach($habs as $prioridade=>$hab_id) {
             $escolha = Escolha::where('ranqueamento_id',$ranqueamento->id)
                                 ->where('user_id', auth()->user()->id)
@@ -94,7 +95,18 @@ class EscolhaController extends Controller
             }
             $escolha->hab_id = $hab_id;
             $escolha->save();
+            $flash .= "Sua escolha na <b>opção {$prioridade}</b> para o ranqueamento foi a habilitação <span style='color:red;'>{$escolha->hab->nomhab}</span>.<br><br>";
         }
+
+        $flash .= "<b>Atenção:</b> Enquanto o período de inscrição do ranqueamento estiver aberto, ainda é possível refazer a(s) escolha(s).";
+
+        if(empty($habs) or is_null($habs)) {
+            $flash = "<b>Atenção:</b> Nenhuma habilitação registrada para ranqueamento. Para participar do ranqueamento, escolha as habilitações que deseja concorrer.";
+            $request->session()->flash('alert-danger',$flash);
+        } else {
+            $request->session()->flash('alert-info',$flash);
+        }
+
         return redirect("/");
     }
 
