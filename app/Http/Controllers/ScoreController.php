@@ -27,6 +27,9 @@ class ScoreController extends Controller
             ->distinct()
             ->get();
 
+        // limpando classificação anterior
+        Score::where('ranqueamento_id',$ranqueamento->id)->delete();
+
         // salvando só os estudantes que vão participar desse ranqueamento
         foreach($candidatos as $candidato) {
             // notas para ranqueamento de ingressantes
@@ -46,8 +49,6 @@ class ScoreController extends Controller
                 $disciplinas = Utils::combina_disciplinas_notas($disciplinas, $notas);
                 $media = Utils::obterMediaPonderada($disciplinas);
             }
-
-            Score::where('ranqueamento_id',$ranqueamento->id)->delete();
 
             $score = new Score;
 
