@@ -23,18 +23,21 @@ class Utils
         // Elegiveis: estão matriculados no semestre 2 no ano, ingressaram no ano e são ciclo básico
         // Conversão da data no sybase:
         // https://infocenter.sybase.com/help/index.jsp?topic=/com.sybase.infocenter.dc38151.1520/html/iqrefbb/Convert.htm
-        $anosem = "{$ano}2";
-        $query = "SELECT V.codpes, V.nompes, S.perhab, CONVERT( CHAR( 20 ), V.dtainivin, 103 ) AS dtainivin
+       
+        $query = "SELECT V.codpes, V.nompes, CONVERT( CHAR( 20 ), V.dtainivin, 103 ) AS dtainivin, V.codhab,
+        CASE V.codhab
+		    WHEN 102 THEN 'matutino'
+		    WHEN 104 THEN 'noturno'
+	    END AS nomecodhab
         FROM VINCULOPESSOAUSP V
-        INNER JOIN SITALUNOATIVOGR S ON (V.codpes = S.codpes) AND (V.codclg = S.codclg)
+        INNER JOIN PROGRAMAGR P ON V.codpes = P.codpes
         WHERE V.tipvin = 'ALUNOGR'
             AND (V.codclg = 8)
-            AND ((V.codhab=102 OR V.codhab=104) AND (S.codhab=102 OR S.codhab=104))
+            AND (V.codhab=102 OR V.codhab=104)
             AND (V.codcurgrd = 8051)
             AND YEAR(dtainivin) = {$ano}
-            AND S.anosem = {$anosem}
-            AND (S.staalu = 'M' OR S.staalu = 'A' OR S.staalu = 'R')
-            ORDER BY V.nompes ASC
+            AND P.stapgm = 'A'
+        ORDER BY V.nompes ASC
         ";
         return DB::fetchAll($query);
     }
@@ -46,19 +49,28 @@ class Utils
         // Elegiveis: estão matriculados no semestre 2 no ano, ingressaram no ano e são ciclo básico
         // Conversão da data no sybase:
         // https://infocenter.sybase.com/help/index.jsp?topic=/com.sybase.infocenter.dc38151.1520/html/iqrefbb/Convert.htm
-        $anosem = "{$ano}2";
-        $query = "SELECT V.codpes, V.nompes, S.perhab, S.staalu, CONVERT( CHAR( 20 ), V.dtainivin, 103 ) AS dtainivin
+        
+        $query = "SELECT P.codpgm, V.tipvin, V.codpes, V.nompes, CONVERT(CHAR(20), V.dtainivin, 103) AS dtainivin, V.codhab,
+        CASE V.codhab
+            WHEN 102 THEN 'matutino'
+            WHEN 104 THEN 'noturno'
+        END AS nomecodhab
         FROM VINCULOPESSOAUSP V
-        INNER JOIN SITALUNOATIVOGR S ON (V.codpes = S.codpes) AND (V.codclg = S.codclg)
-        WHERE V.tipvin = 'ALUNOGR'
+        INNER JOIN PROGRAMAGR P ON V.codpes = P.codpes
+        WHERE P.codpgm = (
+                        SELECT MAX(P.codpgm)
+                        FROM PROGRAMAGR P
+                        WHERE P.codpes = V.codpes
+                        )
+            AND V.tipvin = 'ALUNOGR'
             AND (V.codclg = 8)
-            AND ((V.codhab=102 OR V.codhab=104) AND (S.codhab=102 OR S.codhab=104))
+            AND (V.codhab=102 OR V.codhab=104)
             AND (V.codcurgrd = 8051)
-            AND S.anosem = {$anosem}
-            AND
-                (YEAR(dtainivin) <> {$ano} OR (S.staalu <> 'M' AND S.staalu <> 'A' AND S.staalu <> 'R'))
-            ORDER BY V.nompes ASC
+            AND (YEAR(dtainivin) <> 2025 OR (P.stapgm <> 'A'))
+        ORDER BY V.nompes ASC
         ";
+
+
         return DB::fetchAll($query);
     }
 
@@ -66,16 +78,16 @@ class Utils
         $anosem = "{$ano}2";
 
         $query = "SELECT COUNT(*)
-        FROM VINCULOPESSOAUSP V
-        INNER JOIN SITALUNOATIVOGR S ON (V.codpes = S.codpes) AND (V.codclg = S.codclg)
-        WHERE V.tipvin = 'ALUNOGR'
-            AND (V.codclg = 8)
-            AND ((V.codhab=102 OR V.codhab=104) AND (S.codhab=102 OR S.codhab=104))
-            AND (V.codcurgrd = 8051)
-            AND YEAR(dtainivin) = {$ano}
-            AND S.anosem = {$anosem}
-            AND (S.staalu = 'M' OR S.staalu = 'A' OR S.staalu = 'R')
-            AND V.codpes = $codpes
+                FROM VINCULOPESSOAUSP V
+                    INNER JOIN PROGRAMAGR P 
+                        ON V.codpes = P.codpes
+                WHERE V.tipvin = 'ALUNOGR'
+                    AND (V.codclg = 8)
+                    AND (V.codcurgrd = 8051)
+                    AND YEAR(dtainivin) = {$ano}
+                    AND (V.codhab=102 OR V.codhab=104) 
+                    AND P.stapgm = 'A'
+                    AND V.codpes = $codpes        
         ";
         $record = DB::fetch($query);
         return (bool)$record['computed'];
@@ -83,7 +95,7 @@ class Utils
 
     public static function reranqueamento_check(int $codpes){
         // verificamos se é aluno(a) de graduação ativo
-        $query = "SELECT codpgm FROM PROGRAMAGR WHERE codpes = {$codpes} AND stapgm = 'A'";
+       /* $query = "SELECT codpgm FROM PROGRAMAGR WHERE codpes = {$codpes} AND stapgm = 'A'";
         $record = DB::fetch($query);
         if(!$record) return false;
 
@@ -112,7 +124,8 @@ class Utils
                    ";
         $records = DB::fetchAll($query);
         if(count($records)<=9) return true;
-        return false;
+        return false;*/
+        return true;
     }
 
     public static function lista_habs(){

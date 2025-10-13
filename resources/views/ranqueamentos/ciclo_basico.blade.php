@@ -17,7 +17,7 @@
     <tr>
       <td>{{ $discente['codpes'] }}</td>
       <td>{{ $discente['nompes'] }}</td>
-      <td>{{ $discente['perhab'] }}</td>
+      <td>{{ $discente['nomecodhab'] }}</td>
       <td>{{ $discente['dtainivin'] }}</td>
     </tr>
     @endforeach
@@ -30,7 +30,6 @@
     <tr>
       <th scope="col">Número USP</th>
       <th scope="col">Nome</th>
-      <th scope="col">Situação</th>
       <th scope="col">Período</th>
       <th scope="col">Data de ingresso</th>
     </tr>
@@ -40,8 +39,7 @@
     <tr>
       <td>{{ $discente['codpes'] }}</td>
       <td>{{ $discente['nompes'] }}</td>
-      <td>{{ $discente['staalu'] }}</td>
-      <td>{{ $discente['perhab'] }}</td>
+      <td>{{ $discente['nomecodhab'] }}</td>
       <td>{{ $discente['dtainivin'] }}</td>
     </tr>
     @endforeach
