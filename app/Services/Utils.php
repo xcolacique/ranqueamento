@@ -66,7 +66,8 @@ class Utils
             AND (V.codclg = 8)
             AND (V.codhab=102 OR V.codhab=104)
             AND (V.codcurgrd = 8051)
-            AND (YEAR(dtainivin) <> 2025 OR (P.stapgm <> 'A'))
+            AND YEAR(dtainivin) = 2025 
+            AND (P.stapgm <> 'A')
         ORDER BY V.nompes ASC
         ";
 
