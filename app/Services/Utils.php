@@ -67,6 +67,7 @@ class Utils
             AND (V.codhab=102 OR V.codhab=104)
             AND (V.codcurgrd = 8051)
             AND YEAR(dtainivin) = 2025 
+            --AND YEAR(dtainivin) = {$ano}
             AND (P.stapgm <> 'A')
         ORDER BY V.nompes ASC
         ";
