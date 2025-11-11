@@ -2,6 +2,10 @@
 
 @section('content')
 
+<div class="mb-3">
+    <h5>Total de inscrições: {{ count($grouped) }}</h5>
+</div>
+
 <table class="table table-bordered">
   <thead>
     <tr>
