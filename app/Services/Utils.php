@@ -127,7 +127,54 @@ class Utils
         $records = DB::fetchAll($query);
         if(count($records)<=9) return true;
         return false;*/
-        return true;
+        
+
+
+
+
+  // verificamos se é aluno(a) de graduação ativo
+        $query = "SELECT codpgm FROM PROGRAMAGR WHERE codpes = {$codpes} AND stapgm = 'A'";
+        $record = DB::fetch($query);
+        if(!$record) return false;
+        
+
+
+        // verificamos se é aluno(a) de letras
+        $query = "SELECT V.codpes FROM VINCULOPESSOAUSP V
+                    WHERE V.tipvin = 'ALUNOGR'
+                        AND V.codpes= {$codpes}
+                        AND V.codclg = 8
+                        AND V.codcurgrd = 8051";
+        $record = DB::fetch($query);
+        if(!$record) return false;
+        
+        // podem participar do reranqueamento os alunos:
+        // 1. Cursaram no máximo oito semestres retroativos
+        // 2. Não estão com o curso trancado
+
+
+        $anoreranqueamento = 2026;
+
+   $query = "SELECT COUNT(DISTINCT SUBSTRING(CONVERT(VARCHAR, H.codtur), 1, 5)) AS SEMESTRES
+FROM HISTESCOLARGR H 
+INNER JOIN VINCULOPESSOAUSP V
+	ON V.codpes = H.codpes
+WHERE H.codpes IN ($codpes)
+AND H.codpgm = (SELECT MAX(G.codpgm) FROM HISTESCOLARGR G WHERE G.codpes = H.codpes)
+		AND V.tipvin = 'ALUNOGR'
+		AND H.codtur != '0' AND H.codtur NOT LIKE '%{$anoreranqueamento}%'
+		AND H.stamtr = 'M'";
+
+
+//$records = DB::fetchAll($query);
+$record = DB::fetch($query);
+return (!empty($record) && $record['SEMESTRES'] <= 8);
+
+
+
+
+    return true;
+
     }
 
     public static function lista_habs(){
