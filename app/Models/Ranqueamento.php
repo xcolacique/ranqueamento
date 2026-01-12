@@ -15,7 +15,8 @@ class Ranqueamento extends Model
 
     public function habs(): HasMany
     {
-        return $this->hasMany(Hab::class);
+        return $this->hasMany(Hab::class)
+            ->orderByRaw('nomhab COLLATE utf8mb4_unicode_ci');
     }
 
     public function declinios(): HasMany

@@ -45,7 +45,8 @@ class AppServiceProvider extends ServiceProvider
                 if($ultimo_ranqueamento){
                     $score = Score::where('user_id',$user->id)
                                    ->where('ranqueamento_id',$ultimo_ranqueamento->id)
-                                   ->where('posicao',1)
+                                   //->where('posicao',1)
+                                   ->where('prioridade_eleita',1)
                                    ->first();
                     if($score) return false;
                 }
