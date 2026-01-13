@@ -157,11 +157,11 @@ class Utils
 
    $query = "SELECT COUNT(DISTINCT SUBSTRING(CONVERT(VARCHAR, H.codtur), 1, 5)) AS SEMESTRES
 FROM HISTESCOLARGR H 
-INNER JOIN VINCULOPESSOAUSP V
-	ON V.codpes = H.codpes
-WHERE H.codpes IN ($codpes)
+--INNER JOIN VINCULOPESSOAUSP V
+	--ON V.codpes = H.codpes
+WHERE H.codpes = $codpes
 AND H.codpgm = (SELECT MAX(G.codpgm) FROM HISTESCOLARGR G WHERE G.codpes = H.codpes)
-		AND V.tipvin = 'ALUNOGR'
+		--AND V.tipvin = 'ALUNOGR'
 		AND H.codtur != '0' AND H.codtur NOT LIKE '%{$anoreranqueamento}%'
 		AND H.stamtr = 'M'";
 
