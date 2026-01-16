@@ -298,12 +298,17 @@ return (!empty($record) && $record['SEMESTRES'] <= 8);
         $requerimento = "SELECT R2.coddis, R.tiprqm, R.codrqm FROM REQUERIMENTOGR R
                          INNER JOIN REQUERHISTESC R2 ON (R.codrqm = R2.codrqm)
                          WHERE R.codpes = $codpes AND R.codpgm = $codpgm AND R.rstfim = 'D'
-                         AND R.starqm = 'C' AND R.tiprqm IN ('Dispensa Externa','Dispensa USP','AEL extra-grade USP ')";
-
+                         AND R.starqm = 'C'
+                         AND (R.tiprqm LIKE '%AEL%' OR R.tiprqm LIKE '%Dispensa%')";
+                         //AND R.tiprqm IN ('Dispensa Externa','Dispensa USP','AEL extra-grade USP ')";
         $requerimentos = DB::fetchAll($requerimento);
 
-        [$rqmExternos, $rqmInternos] = collect($requerimentos)->partition(function($requerimento) {
+        /*[$rqmExternos, $rqmInternos] = collect($requerimentos)->partition(function($requerimento) {
             return $requerimento['tiprqm'] === 'Dispensa Externa';
+        });*/
+
+        [$rqmExternos, $rqmInternos] = collect($requerimentos)->partition(function($requerimento) {
+        return in_array($requerimento['tiprqm'], ['Dispensa Externa', 'AEL extra-grade EXT']);
         });
 
         $externo = $rqmExternos->isEmpty() ? collect([]) : DispensaExterna::handle($codpes, $codpgm, $rqmExternos);
