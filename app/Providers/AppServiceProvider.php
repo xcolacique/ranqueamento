@@ -37,7 +37,7 @@ class AppServiceProvider extends ServiceProvider
                 return Utils::ciclo_basico_check($user->codpes, $ranqueamento->ano);
             }
             if($ranqueamento && $ranqueamento->tipo=='reranqueamento') {
-                // alunos que participaram do último ranqueamento e ficaram na primeira posição
+                // alunos que participaram do último ranqueamento e conquistaram vaga na primeira habilitação eleita
                 // não podem participar do re-ranqueamento
                 $ultimo_ranqueamento = Ranqueamento::where('ano',$ranqueamento->ano-1)
                                                     ->where('tipo','ingressantes')
@@ -55,5 +55,31 @@ class AppServiceProvider extends ServiceProvider
 
             return false;
         });
+
+
+
+        // TESTE
+
+        Gate::define('ver-resultado', function (User $user) {
+
+            $exibirResultados = true;      // Mudar depois para uma opção pro ADM
+        
+        if (!$exibirResultados) return false;
+
+    // último ranqueamento encerrado
+    $ranqueamento = Ranqueamento::where('status', 0)
+        ->orderByDesc('ano')
+        ->orderByDesc('id')
+        ->first();
+
+    if (!$ranqueamento) return false;
+
+    // usuário participou?
+    return Score::where('user_id', $user->id)
+                ->where('ranqueamento_id', $ranqueamento->id)
+                ->exists();
+});
+
+
     }
 }
