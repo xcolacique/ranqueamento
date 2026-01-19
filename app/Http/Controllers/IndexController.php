@@ -19,7 +19,7 @@ class IndexController extends Controller
             'ranqueamento' => $ranqueamento
         ]);*/
 
-        $exibirResultados = true;
+        //$exibirResultados = true;
 
         $user = auth()->user();
         // ranqueamento ativo
