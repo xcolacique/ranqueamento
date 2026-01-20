@@ -62,7 +62,7 @@ class AppServiceProvider extends ServiceProvider
 
         Gate::define('ver-resultado', function (User $user) {
 
-            $exibirResultados = false;      // Mudar depois para uma opção pro ADM
+            $exibirResultados = true;      // Mudar depois para uma opção pro ADM
         
         if (!$exibirResultados) return false;
 
