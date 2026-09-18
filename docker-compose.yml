@@ -1,5 +1,6 @@
 services:
   ranqueamento:
+    build: .
     image: ranqueamento:latest
     container_name: ranqueamento
     ports:
@@ -28,6 +29,33 @@ services:
     networks:
       - ranqueamento-network
 
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: ranqueamento_phpmyadmin
+    restart: always
+    depends_on:
+      - mariadb
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: mariadb
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: ranqueamento
+    networks:
+      - ranqueamento-network
+
+  selenium:
+    image: selenium/standalone-chrome
+    container_name: ranqueamento_selenium
+    ports:
+      - "7900:7900"
+    networks:
+      - ranqueamento-network
+    shm_size: 2gb
+
+  # No /etc/hosts do seu computador colocar a linha `127.0.0.1 auth.local` 
+  # particularidades do protocolo oAuth1 usado na USP
   senhaunica-faker:
     image: uspdev/senhaunica-faker
     container_name: ranqueamento_senhaunica-faker
@@ -40,14 +68,14 @@ services:
         aliases:
           - auth.local
 
-  selenium:
-    image: selenium/standalone-chrome
-    container_name: ranqueamento_selenium
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: ranqueamento_mailpit
     ports:
-      - "7900:7900" # VNC (pra ver o browser rodando)
+      - "1025:1025"   # SMTP
+      - "8025:8025"   # Interface Web
     networks:
       - ranqueamento-network
-    shm_size: 2gb
 
 networks:
   ranqueamento-network:
