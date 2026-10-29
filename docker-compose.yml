@@ -1,0 +1,84 @@
+services:
+  ranqueamento:
+    build: .
+    image: ranqueamento:latest
+    container_name: ranqueamento
+    ports:
+      - "8000:80"
+    depends_on:
+      - mariadb
+    networks:
+      - ranqueamento-network
+    volumes:
+      - ./:/var/www/html
+    environment:
+      HOME: /tmp
+    user: "${UID:-1000}:${GID:-1000}"
+
+  mariadb:
+    image: mariadb:11
+    container_name: ranqueamento_mariadb
+    restart: always
+    environment:
+      MYSQL_DATABASE: ranqueamento
+      MYSQL_USER: ranqueamento
+      MYSQL_PASSWORD: ranqueamento
+      MYSQL_ROOT_PASSWORD: ranqueamento
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    networks:
+      - ranqueamento-network
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: ranqueamento_phpmyadmin
+    restart: always
+    depends_on:
+      - mariadb
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: mariadb
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: ranqueamento
+    networks:
+      - ranqueamento-network
+
+  selenium:
+    image: selenium/standalone-chrome
+    container_name: ranqueamento_selenium
+    ports:
+      - "7900:7900"
+    networks:
+      - ranqueamento-network
+    shm_size: 2gb
+
+  # No /etc/hosts do seu computador colocar a linha `127.0.0.1 auth.local` 
+  # particularidades do protocolo oAuth1 usado na USP
+  senhaunica-faker:
+    image: uspdev/senhaunica-faker
+    container_name: ranqueamento_senhaunica-faker
+    ports:
+      - "3141:3141"
+    environment:
+          - APP_URL=http://auth.local:3141
+    networks:
+      ranqueamento-network:
+        aliases:
+          - auth.local
+
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: ranqueamento_mailpit
+    ports:
+      - "1025:1025"   # SMTP
+      - "8025:8025"   # Interface Web
+    networks:
+      - ranqueamento-network
+
+networks:
+  ranqueamento-network:
+
+volumes:
+  mariadb_data:
